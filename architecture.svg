@@ -103,10 +103,10 @@
 <text x="904" y="350">Runs headless</text>
 <text x="904" y="374">on an Ollama</text>
 <text x="904" y="398">Cloud model.</text>
-<text x="904" y="422">Rewrites the</text>
-<text x="904" y="446">styling to</text>
-<text x="904" y="470">match the</text>
-<text x="904" y="494">brand.</text>
+<text x="904" y="422">Writes the</text>
+<text x="904" y="446">brand theme</text>
+<text x="904" y="470">while script</text>
+<text x="904" y="494">and voice run.</text>
 
 <rect class="box" x="1066" y="250" width="150" height="300" rx="10"/>
 <text x="1076" y="282" class="h">Render</text>
@@ -174,7 +174,7 @@
 <text x="1580" y="788" class="mono">launchlocal/voice.py</text>
 
 <rect x="20" y="806" width="170" height="28" rx="14" fill="#f472b6"/><text x="105" y="826" class="pill">CodeAF</text>
-<text x="208" y="826">Coding harness, headless on an Ollama Cloud model. Restyles the video to the brand.</text>
+<text x="208" y="826">Coding harness, headless on an Ollama Cloud model. Writes the theme that styles the video like the official site.</text>
 <text x="1580" y="826" class="mono">launchlocal/coder.py</text>
 
 <rect x="20" y="844" width="170" height="28" rx="14" fill="#fbbf24"/><text x="105" y="864" class="pill">Daytona</text>
