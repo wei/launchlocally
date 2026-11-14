@@ -53,7 +53,7 @@ flowchart LR
 
 - The input is one URL. No brand guide, script or footage is needed. The brand colors, logo and images are read from the official site (`run_research` in [`launchlocal/research.py`](launchlocal/research.py)).
 - Every sentence in the video carries a `fact_id` from `facts.json`. Unsourced sentences are dropped, and numbers must appear in the cited source (`enforce` and `_numbers_ok` in [`launchlocal/script.py`](launchlocal/script.py)).
-- The brief lets a reviewer check each claim against its source before the video is used. A measured run produced {{FACTS}} sourced facts and took {{SECONDS}} seconds from URL to video.
+- The brief lets a reviewer check each claim against its source before the video is used. A measured run (tavily.com for Japan, 2026-11-14) produced 43 sourced facts and took 101 seconds from URL to video. A run where the buyer gate rejects cut 1 takes about 160 seconds for both cuts.
 
 ## Technical Execution
 

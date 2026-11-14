@@ -187,6 +187,7 @@ async def _design_brief(rd, pack, brand, facts):
 
 async def write_script(run_dir: Path, pack: dict) -> None:
     rd = Path(run_dir)
+    llm.RUN_DIR.set(rd)  # llm logs which provider serves this run
     brand, facts = read_json(rd / "brand.json"), read_json(rd / "facts.json")
     emit(rd, "strategist", "start", f"Writing a {pack['language_name']} launch script from {len(facts)} sourced facts")
     user = f"Brand profile:\n{json.dumps(brand, ensure_ascii=False)}\n\nFacts:\n{_facts_block(facts)}\n\nReturn JSON shaped:\n{SCENE_SHAPE}"
@@ -234,6 +235,7 @@ def _assemble(draft: dict, pack: dict, brand: dict, old: dict | None = None) -> 
 
 async def buyer_gate(run_dir: Path, pack: dict, cut: int) -> dict:
     rd = Path(run_dir)
+    llm.RUN_DIR.set(rd)  # llm logs which provider serves this run
     script, facts = read_json(rd / "script.json"), read_json(rd / "facts.json")
     p = pack["buyer_persona"]
     emit(rd, "gate", "start", f"{p['gate_name']}: {p['title_local']} reviews cut {cut}")
@@ -289,6 +291,7 @@ async def buyer_gate(run_dir: Path, pack: dict, cut: int) -> dict:
 
 async def revise_script(run_dir: Path, pack: dict, round: dict) -> None:
     rd = Path(run_dir)
+    llm.RUN_DIR.set(rd)  # llm logs which provider serves this run
     old, brand, facts = read_json(rd / "script.json"), read_json(rd / "brand.json"), read_json(rd / "facts.json")
     emit(rd, "strategist", "start", f"Revising after the buyer's review of cut {round['cut']}")
     p = pack["buyer_persona"]
