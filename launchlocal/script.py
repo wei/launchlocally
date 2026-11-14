@@ -134,12 +134,17 @@ async def _verify_support(script, facts, brand, pack, rd):
         for i, it in enumerate(sc.get("on_screen", [])):
             items.append({"key": f"{sc['id']}.{i}", "text": f"{it.get('text_en', '')} / {it.get('text_local', '')}",
                           "facts": [by_id[it["fact_id"]]["claim_en"]]})
+    profile = f"{brand.get('name')}: {brand.get('tagline', '')}. Category: {brand.get('category', '')}. (from the official homepage)"
+    for it in items:
+        it["facts"] = [profile] + it["facts"]
     try:
         out = await llm.chat_json(
-            f"You are a strict fact checker for a launch video about the product {brand.get('name')}. For each item, decide whether "
-            "its text is fully supported by its facts. Check WHO each fact is about: a fact about another company, a competitor or the "
-            f"market in general does NOT support a claim that {brand.get('name')} has, holds or does that thing. A question, a general "
-            "statement about buyers, or a call to action needs no support beyond not contradicting the facts.",
+            f"You are a fact checker for a launch video about the product {brand.get('name')}. For each item, set supported to false ONLY when "
+            "the text makes a concrete, checkable claim that its facts do not support. The two cases to catch: (1) wrong attribution: a fact "
+            f"about another company, a competitor or the market in general is presented as something {brand.get('name')} has, holds or does "
+            "(certifications, customers, prices, features); (2) a specific number, certification, customer name, price or feature that appears "
+            "in no fact. Everything else is supported: questions, calls to action, general statements about buyers or the market, and general "
+            "descriptions of the product that agree with its official tagline and category.",
             json.dumps(items, ensure_ascii=False) + '\nReturn [{"key": ..., "supported": true or false, "reason": "short"}] for every item.', 1500)
         for o in out if isinstance(out, list) else []:
             if isinstance(o, dict) and o.get("supported") is False and o.get("key"):

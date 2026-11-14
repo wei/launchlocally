@@ -1,0 +1,137 @@
+{
+  "id": "en-INTL",
+  "label": "International (English)",
+  "direction": "Product pitched in English to international companies launching in Japan",
+  "language": "en",
+  "language_name": "English",
+  "country": "united states",
+  "currency": "USD",
+  "voice": {
+    "backend": "kokoro",
+    "voice": "af_heart",
+    "lang_code": "en-us",
+    "speed": 1.0
+  },
+  "fonts": {
+    "heading": "Inter",
+    "body": "Inter"
+  },
+  "search": {
+    "country": "united states",
+    "local_sites": []
+  },
+  "research_areas": [
+    {
+      "id": "competitors",
+      "label": "Alternatives",
+      "queries": [
+        "{category} tools 2026",
+        "video localization tools for Japan market"
+      ]
+    },
+    {
+      "id": "local_pricing",
+      "label": "Pricing norms",
+      "queries": [
+        "Japan market entry localization agency cost",
+        "{category} pricing"
+      ]
+    },
+    {
+      "id": "vocabulary",
+      "label": "Buyer vocabulary",
+      "queries": [
+        "localization vs translation Japan marketing",
+        "Japan go-to-market strategy foreign software companies"
+      ]
+    },
+    {
+      "id": "trust",
+      "label": "Trust and proof",
+      "queries": [
+        "what Japanese enterprise buyers expect from foreign SaaS vendors",
+        "ringi approval process foreign vendors Japan"
+      ]
+    },
+    {
+      "id": "presence",
+      "label": "Market context",
+      "queries": [
+        "foreign SaaS companies entering Japan 2026",
+        "why foreign startups fail in Japan localization"
+      ]
+    },
+    {
+      "id": "style",
+      "label": "Marketing style",
+      "queries": [
+        "Japanese B2B landing page design differences",
+        "B2B SaaS launch video best practices"
+      ]
+    },
+    {
+      "id": "news",
+      "label": "Current news",
+      "queries": [
+        "Japan startup market entry news 2026",
+        "AI agents marketing localization 2026"
+      ]
+    }
+  ],
+  "copy_rules": [
+    "Write plain, confident American English. Active voice, second person (you, your team).",
+    "Lead with the benefit, not the feature or the company history. The headline states the outcome in under 8 words.",
+    "One idea per scene. Cut qualifiers, filler and corporate phrasing; no 'cutting-edge', 'revolutionary' or 'world-class' unless a source says it.",
+    "Use specific numbers and named customers when sourced; prices in USD only if a source gives them.",
+    "Write the product name exactly as the brand writes it in Latin letters.",
+    "Keep each narration line under 18 words so it reads in about 5 seconds.",
+    "End with a direct, action-first call to action such as 'Start free' or 'Book a demo'."
+  ],
+  "style_rules": [
+    "Sparser than a Japanese page: one bold headline and at most two short supporting points per scene, lots of whitespace.",
+    "Bold, large headline (88 to 110px, weight 800) with tight tracking; supporting text 36px, weight 500.",
+    "Use the brand's own colors with one accent color for emphasis; Inter for all text.",
+    "Show proof as a single strong number, logo strip or quote rather than a list.",
+    "Confident, snappy motion: 250 to 400ms eases, quick cuts, no clutter.",
+    "End on the logo, a single call-to-action button and the URL."
+  ],
+  "cta_examples": [
+    "Start free",
+    "Book a demo",
+    "Get started"
+  ],
+  "buyer_persona": {
+    "title_local": "Head of International Expansion",
+    "title_en": "Head of international expansion at a software company planning a Japan launch",
+    "gate_name": "Expansion review",
+    "cares_about": [
+      "Whether the output is truly local, not a translation",
+      "Evidence: every claim traceable to a source",
+      "Speed and cost compared with hiring a local agency",
+      "What the tool cannot do, stated plainly",
+      "Clear next step"
+    ],
+    "questions": [
+      {
+        "id": "tone",
+        "q": "Does it read like native, confident US B2B copy with no hype or translation artifacts?",
+        "needs_evidence": false
+      },
+      {
+        "id": "trust",
+        "q": "Are accuracy and honesty concerns addressed with evidence?",
+        "needs_evidence": true
+      },
+      {
+        "id": "local_proof",
+        "q": "Is there concrete proof that matters to a company entering Japan, such as how local review works, sourced facts, or real example runs?",
+        "needs_evidence": true
+      },
+      {
+        "id": "clarity",
+        "q": "Is it clear in seconds what the product does for my team and what to do next?",
+        "needs_evidence": false
+      }
+    ]
+  }
+}

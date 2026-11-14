@@ -69,11 +69,11 @@ async def run_stage(stage: str, run_id: str, market: str = "ja-JP", cut: int = 1
                 if saved.exists():
                     import json
                     now = time.time()
-                    with open(rd / "events.jsonl", "a", encoding="utf-8") as out:
+                    with open(rd / "events.jsonl", "a", encoding="utf-8") as fh:  # not `out`: that is this stage's result
                         for i, line in enumerate(saved.read_text(encoding="utf-8").splitlines()):
                             ev = json.loads(line)
                             ev["ts"] = now + i * 0.03  # replayed quickly; the log line above says it is cached
-                            out.write(json.dumps(ev, ensure_ascii=False) + "\n")
+                            fh.write(json.dumps(ev, ensure_ascii=False) + "\n")
                 else:
                     for f in facts:  # replay the facts so the research lanes still fill in
                         common.emit(rd, f"{'scout' if f.get('scope') == 'product' else 'market'}.{f.get('area', 'research')}", "fact", f.get("claim_en", ""), **f)
