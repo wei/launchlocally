@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LaunchLocal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121315; --panel:#1c1e21; --line:#33363b;
+  --text:#f3f2ee; --dim:#a9aba9; --accent:#ff6f3c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;color:var(--text);
+  font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* 1em = 1/64 of the slide width, so 20px at 1280x720 */
+.stage{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(100vw,177.778vh);height:min(56.25vw,100vh);
+  font-size:calc(min(100vw,177.778vh) / 64);background:var(--bg);overflow:hidden;cursor:pointer}
+.slide{position:absolute;inset:0;padding:2.5em 4em 3.2em;display:flex;flex-direction:column;
+  visibility:hidden;line-height:1.45}
+.slide.on{visibility:visible}
+.slide::after{content:attr(data-n) " / 7";position:absolute;right:2em;bottom:1.1em;
+  font-size:.8em;color:var(--dim);font-variant-numeric:tabular-nums}
+.slide::before{content:"LaunchLocal";position:absolute;left:4em;bottom:1.1em;
+  font-size:.8em;color:var(--dim);font-weight:700;letter-spacing:.02em}
+.slide[data-n="1"]::before{content:none}
+
+h2{font-size:2.7em;font-weight:900;line-height:1.15;letter-spacing:-.01em}
+.jp{color:var(--dim);font-weight:500}
+h2 + .jp{font-size:1.3em;margin-top:.35em;padding-bottom:.7em;border-bottom:.12em solid var(--accent);
+  align-self:flex-start;color:var(--text)}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+b,.acc{color:var(--accent);font-weight:700}
+
+/* 1 title */
+.title{justify-content:center}
+.title h1{font-size:6.4em;font-weight:900;line-height:1;letter-spacing:-.03em}
+.title h1 span{color:var(--accent)}
+.title .tag{font-size:2.5em;font-weight:700;margin-top:.7em}
+.title .tagjp{font-size:1.55em;margin-top:.4em;color:var(--text);font-weight:500}
+.title .meta{margin-top:2.6em;padding-top:1.1em;border-top:.06em solid var(--line);
+  display:flex;justify-content:space-between;align-items:flex-end;font-size:1.25em}
+.title .meta small{display:block;font-size:.8em;color:var(--dim);margin-top:.2em}
+.title .team{text-align:right}
+.title .team strong{color:var(--accent)}
+
+/* 2 problem */
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2em}
+.card{background:var(--panel);border:.06em solid var(--line);border-radius:.5em;padding:1.1em 1.2em}
+.card h3{font-size:1.5em;font-weight:700;line-height:1.25}
+.card .jp{font-size:1.05em;margin-top:.3em}
+.lead{font-size:1.55em;font-weight:500;line-height:1.4}
+.lead + .jp{font-size:1.15em;margin:.3em 0 1.1em}
+.today{margin-top:1.2em;border-left:.3em solid var(--accent);padding:.2em 0 .2em 1em}
+.today p{font-size:1.55em;font-weight:700}
+.today .jp{font-size:1.15em;margin-top:.2em}
+
+/* 3 flow */
+.s3{padding-left:2.4em;padding-right:2.4em}
+.s3::before{left:2.4em}
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:1.1em}
+.step{position:relative;background:var(--panel);border:.06em solid var(--line);border-radius:.5em;
+  padding:.75em .75em .85em}
+.step:not(:last-child)::after{content:"";position:absolute;right:-.82em;top:50%;width:.45em;height:.45em;
+  border-top:.14em solid var(--accent);border-right:.14em solid var(--accent);transform:translateY(-50%) rotate(45deg)}
+.step .n{font-size:1.5em;font-weight:900;color:var(--accent);line-height:1}
+.step h3{font-size:1em;font-weight:700;line-height:1.25;margin:.45em 0 .4em;min-height:2.5em}
+.step p{font-size:.82em;line-height:1.4}
+.step .jp{font-size:.74em;line-height:1.5;margin-top:.55em}
+.out{margin-top:1em;border:.1em solid var(--accent);border-radius:.5em;padding:.7em 1.1em;
+  display:flex;gap:1.1em;align-items:center}
+.out .lab{font-size:.9em;font-weight:900;color:var(--accent);white-space:nowrap}
+.out p{font-size:1.15em;font-weight:700;line-height:1.3}
+.out .jp{font-size:.88em;margin-top:.15em}
+
+/* 4 table */
+.s4{padding-top:1.8em}
+.s4 h2{font-size:2em}
+.s4 h2 + .jp{font-size:1.05em;margin-top:.2em;padding-bottom:.4em}
+.s4 .body{justify-content:flex-start;padding-top:.9em}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th,td{text-align:left;vertical-align:top;padding:.42em .8em;border-bottom:.06em solid var(--line)}
+th{font-size:.8em;font-weight:700;color:var(--dim);padding-top:0}
+th span{font-weight:500;margin-left:.6em;white-space:nowrap}
+td{font-size:.88em;line-height:1.38}
+td .jp{display:block;font-size:.86em;margin-top:.25em;line-height:1.45}
+td.p{font-size:1.25em;font-weight:900;color:var(--accent);line-height:1.2}
+col.c1{width:16%} col.c2{width:46%} col.c3{width:38%}
+tr:last-child td{border-bottom:0}
+
+/* 5 honest */
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:1.1em}
+.s5 .card h3{font-size:1.4em}
+.s5 .card h3 em{font-style:normal;color:var(--accent)}
+
+/* 6 market */
+.split{display:grid;grid-template-columns:5fr 6fr;gap:2em;align-items:stretch}
+.pack{background:var(--panel);border:.06em solid var(--line);border-radius:.5em;padding:1em 1.3em}
+.pack .file{font-size:1em;font-weight:700;color:var(--accent);margin-bottom:.5em}
+.pack ul{list-style:none}
+.pack li{display:flex;justify-content:space-between;align-items:baseline;font-size:1.15em;font-weight:700;
+  padding:.33em 0;border-top:.06em solid var(--line)}
+.pack li span{font-size:.82em;font-weight:500;color:var(--dim)}
+.rows{display:flex;flex-direction:column;gap:.9em;justify-content:space-between}
+.rows .card{flex:1;padding:.8em 1.1em}
+.rows .card h3{font-size:1.3em}
+.rows .card .k{font-size:.8em;font-weight:900;color:var(--accent);display:block;margin-bottom:.15em}
+.rows .card .jp{font-size:.95em}
+
+/* 7 links */
+.links{display:grid;grid-template-columns:auto 1fr;gap:.5em 1.4em;align-items:baseline;margin-bottom:1.6em}
+.links dt{font-size:1.1em;font-weight:700;color:var(--dim)}
+.links dt span{font-weight:500;font-size:.85em;margin-left:.5em}
+.links dd{font-size:1.6em;font-weight:700;color:var(--accent);word-break:break-all}
+.links a{color:inherit}
+.stat{text-align:center;padding:1.1em 1em}
+.stat .v{font-size:3.6em;font-weight:900;color:var(--accent);line-height:1.1;word-break:break-all}
+.stat .l{font-size:1.15em;font-weight:700;margin-top:.4em}
+.stat .jp{font-size:.95em;margin-top:.15em}
+
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  html,body{height:auto;background:var(--bg)}
+  .stage{position:static;transform:none;width:13.333in;height:auto;font-size:calc(13.333in / 64);overflow:visible}
+  .slide{position:relative;inset:auto;visibility:visible;width:13.333in;height:7.5in;
+    break-after:page;page-break-after:always;break-inside:avoid;overflow:hidden;background:var(--bg)}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+}
+</style>
+</head>
+<body>
+<main class="stage" id="stage">
+
+<section class="slide title on" data-n="1">
+  <h1>Launch<span>Local</span></h1>
+  <p class="tag">Paste a URL. Launch like a local.</p>
+  <p class="tagjp">URLを貼り付けるだけで、現地に合ったローンチ動画を作ります。</p>
+  <div class="meta">
+    <div>Agent Forge AI Hackathon Tokyo
+      <small>14 November 2026 · Plug and Play Japan, Shibuya<br>2026年11月14日 · Plug and Play Japan(渋谷)</small></div>
+    <div class="team"><small>Team / チーム</small><strong>{{TEAM}}</strong></div>
+  </div>
+</section>
+
+<section class="slide" data-n="2">
+  <h2>Problem</h2>
+  <p class="jp">課題</p>
+  <div class="body">
+    <p class="lead">A company entering a new market translates its launch material. Local buyers expect more than a translation.</p>
+    <p class="jp">新しい市場に入る企業は、ローンチ資料を翻訳します。しかし、現地の購入者は翻訳だけでは納得しません。</p>
+    <div class="cols3">
+      <div class="card"><h3>Local <b>proof</b></h3><p class="jp">現地での実績や事例</p></div>
+      <div class="card"><h3>Local <b>tone</b></h3><p class="jp">現地で自然な言葉づかい</p></div>
+      <div class="card"><h3>Local <b>format</b></h3><p class="jp">現地で見慣れた構成と体裁</p></div>
+    </div>
+    <div class="today">
+      <p>Today this means hiring a local agency and waiting weeks.</p>
+      <p class="jp">現在は、現地の代理店に依頼して数週間待つ必要があります。</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide s3" data-n="3">
+  <h2>What it does</h2>
+  <p class="jp">LaunchLocalの処理の流れ</p>
+  <div class="body">
+    <div class="flow">
+      <div class="step"><div class="n">1</div><h3>URL and market</h3>
+        <p>Paste a product URL and pick a market.</p>
+        <p class="jp">製品のURLを貼り付け、市場を選びます。</p></div>
+      <div class="step"><div class="n">2</div><h3>12 research agents</h3>
+        <p>They read the official site and the local web in parallel.</p>
+        <p class="jp">公式サイトと現地のウェブを並行して読みます。</p></div>
+      <div class="step"><div class="n">3</div><h3>Strategist</h3>
+        <p>Writes a four-scene script in the local language. Every sentence carries a source.</p>
+        <p class="jp">現地の言語で4場面の台本を書きます。すべての文に出典が付きます。</p></div>
+      <div class="step"><div class="n">4</div><h3>Voice model</h3>
+        <p>Narrates the script.</p>
+        <p class="jp">台本を音声で読み上げます。</p></div>
+      <div class="step"><div class="n">5</div><h3>Coding agent and sandbox</h3>
+        <p>The agent styles the video like the official site. A sandbox renders it.</p>
+        <p class="jp">動画の見た目を公式サイトに合わせ、サンドボックスでレンダリングします。</p></div>
+      <div class="step"><div class="n">6</div><h3>Local buyer agent</h3>
+        <p>Approves or rejects the cut. The system fixes what it rejected.</p>
+        <p class="jp">動画を承認または却下します。却下された点はシステムが修正します。</p></div>
+    </div>
+    <div class="out">
+      <span class="lab">OUTPUT / 出力</span>
+      <div><p>A launch video, plus an interactive brief where every claim opens its source.</p>
+      <p class="jp">ローンチ動画と、すべての記述から出典を開けるインタラクティブな資料を出力します。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide s4" data-n="4">
+  <h2>Partner technology</h2>
+  <p class="jp">パートナー技術の役割</p>
+  <div class="body">
+    <table>
+      <colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup>
+      <thead><tr><th>Partner</th><th>Job in this product<span>この製品での役割</span></th><th>What breaks without it<span>ない場合に起きること</span></th></tr></thead>
+      <tbody>
+        <tr><td class="p">Tavily</td>
+          <td>Map, extract and search across 12 research areas.
+            <span class="jp">12の調査領域で、サイトマップの取得、本文の抽出、検索を行います。</span></td>
+          <td>No sourced facts. The video is only a translation.
+            <span class="jp">出典付きの事実がなくなり、動画は翻訳だけになります。</span></td></tr>
+        <tr><td class="p">Nosana</td>
+          <td>A hosted Qwen model writes the script and plays the local buyer. A GPU deployment runs the voice model.
+            <span class="jp">ホストされたQwenモデルが台本を書き、現地の購入者役も務めます。音声モデルはGPUデプロイメントで動きます。</span></td>
+          <td>No script, no review and no narration.
+            <span class="jp">台本、レビュー、ナレーションがすべてなくなります。</span></td></tr>
+        <tr><td class="p">Daytona</td>
+          <td>A sandbox renders the agent-written video composition and serves the result.
+            <span class="jp">エージェントが書いた動画コンポジションをサンドボックスでレンダリングし、結果を配信します。</span></td>
+          <td>Nowhere safe to run generated code, and no video.
+            <span class="jp">生成されたコードを安全に実行する場所がなく、動画も作れません。</span></td></tr>
+        <tr><td class="p">CodeAF<br>AgentField</td>
+          <td>CodeAF rewrites the composition's styling to match the brand. The AgentField control plane runs every agent and shows the workflow graph.
+            <span class="jp">CodeAFがスタイルをブランドに合わせて書き換えます。AgentFieldが全エージェントを実行し、ワークフローグラフを表示します。</span></td>
+          <td>No restyle, and no trace of who did what.
+            <span class="jp">スタイルの調整ができず、どのエージェントが何をしたかの記録も残りません。</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide s5" data-n="5">
+  <h2>Honest by design</h2>
+  <p class="jp">正確さを守る設計</p>
+  <div class="body">
+    <div class="cols2">
+      <div class="card"><h3>Every sentence in the video has a <em>source</em>. Unsourced sentences are dropped.</h3>
+        <p class="jp">動画のすべての文に出典があります。出典のない文は削除します。</p></div>
+      <div class="card"><h3>Numbers and prices are <em>copied</em> from sources, never generated.</h3>
+        <p class="jp">数値と価格は出典からそのまま転記し、生成しません。</p></div>
+      <div class="card"><h3>The buyer gate is <em>strict</em>. It can approve or reject.</h3>
+        <p class="jp">購入者役の審査は厳格で、承認することも却下することもあります。</p></div>
+      <div class="card"><h3>Cached runs are <em>labelled</em> as cached.</h3>
+        <p class="jp">キャッシュを使った実行には、キャッシュであることを表示します。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-n="6">
+  <h2>Any market</h2>
+  <p class="jp">どの市場にも対応できます</p>
+  <div class="body">
+    <div class="split">
+      <div class="pack">
+        <p class="file">Market pack: one JSON file / マーケットパック(JSONファイル1つ)</p>
+        <ul>
+          <li>Language<span>言語</span></li>
+          <li>Voice<span>音声</span></li>
+          <li>Search locale<span>検索ロケール</span></li>
+          <li>Copy rules<span>文章のルール</span></li>
+          <li>Layout conventions<span>レイアウトの慣習</span></li>
+          <li>Buyer persona<span>購入者ペルソナ</span></li>
+        </ul>
+      </div>
+      <div class="rows">
+        <div class="card"><span class="k">DEFAULT / 標準</span><h3>International product to Japan</h3>
+          <p class="jp">海外の製品を日本市場に向けてローンチします。</p></div>
+        <div class="card"><span class="k">REVERSE / 逆方向</span><h3>Japanese product to global, in English</h3>
+          <p class="jp">日本の製品を英語で海外に向けてローンチします。</p></div>
+        <div class="card"><span class="k">NEW MARKET / 新しい市場</span><h3>A new market is a new file</h3>
+          <p class="jp">ファイルを1つ追加すれば、新しい市場に対応できます。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-n="7">
+  <h2>Links and numbers</h2>
+  <p class="jp">リンクと数値</p>
+  <div class="body">
+    <dl class="links">
+      <dt>Repository<span>リポジトリ</span></dt><dd>{{REPO_URL}}</dd>
+      <dt>Demo<span>デモ</span></dt><dd>{{DEMO_URL}}</dd>
+    </dl>
+    <div class="cols3">
+      <div class="card stat"><div class="v">{{FACTS}}</div><p class="l">sourced facts per run</p><p class="jp">1回の実行で得る出典付きの事実</p></div>
+      <div class="card stat"><div class="v">{{AGENTS}}</div><p class="l">agents per run</p><p class="jp">1回の実行で動くエージェント</p></div>
+      <div class="card stat"><div class="v">{{SECONDS}}</div><p class="l">seconds from URL to video</p><p class="jp">URLから動画までの秒数</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<script>
+(function(){
+  var slides=document.querySelectorAll('.slide'),i=0;
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    history.replaceState(null,'','#'+(i+1));
+  }
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].indexOf(e.key)>-1){e.preventDefault();go(i+1)}
+    else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>-1){e.preventDefault();go(i-1)}
+    else if(e.key==='Home')go(0);
+    else if(e.key==='End')go(slides.length-1);
+  });
+  // click: left quarter of the screen goes back, the rest goes forward
+  document.addEventListener('click',function(e){
+    if(e.target.closest('a'))return;
+    go(e.clientX<window.innerWidth/4?i-1:i+1);
+  });
+  window.addEventListener('hashchange',function(){go((parseInt(location.hash.slice(1),10)||1)-1)});
+  go((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>
