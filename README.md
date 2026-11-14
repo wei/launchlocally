@@ -4,8 +4,9 @@ Paste a URL. Launch like a local. LaunchLocal takes a product URL and a target m
 
 ![LaunchLocal architecture. A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research with Tavily and Nosana hosted Qwen, script with Nosana hosted Qwen, voice on a Nosana GPU deployment, a locally built baseline composition, restyling with CodeAF, rendering in a Daytona sandbox, and a buyer gate on Nosana hosted Qwen. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.](site/architecture.svg)
 
-Demo: {{DEMO_URL}}
-Slides: {{SLIDES_URL}}
+- Demo (recorded runs replayed in the browser, labelled as cached): https://wei.github.io/launchlocal/
+- Slides: https://wei.github.io/launchlocal/slides/
+- Submission answers: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
 
 ## How it works
 
@@ -14,9 +15,9 @@ Slides: {{SLIDES_URL}}
 3. **Script.** Nosana hosted Qwen writes a four-scene script (hook, product, proof, call to action) in the local language, plus a design brief. A sentence stays only if it cites a `fact_id` that exists in `facts.json`.
 4. **Voice.** A Kokoro voice model on a Nosana GPU deployment narrates each scene.
 5. **Compose.** Local code builds a baseline Hyperframes HTML composition from the script, the brand profile and the audio.
-6. **Code.** CodeAF, run headless on an Ollama Cloud model, rewrites the composition's styling to match the brand and the design brief.
+6. **Code.** CodeAF, run headless on an Ollama Cloud model, writes `theme.css`: a stylesheet that makes the video look like the official site, adapted to the market's style rules. It starts as soon as the brand profile exists and runs beside research, script and voice, so it does not add to the wait. The theme is used only if it passes the checks and the Hyperframes lint.
 7. **Render.** A Daytona sandbox renders the composition to MP4 with headless Chrome and FFmpeg, and serves the result.
-8. **Buyer gate.** A local buyer persona from the market pack scores the cut and approves or rejects it. On reject, the script is revised and voice, compose, code, render and the gate run once more as cut 2.
+8. **Buyer gate.** A local buyer persona from the market pack scores the script of each cut while it is voiced and rendered. Three verdicts: `approve`; `reject`, when an unused sourced fact would fix the concern, in which case the script is revised and cut 2 is voiced and rendered; and `approve_with_gaps`, when the video already uses the evidence that exists and the rest is for the vendor to provide. The gaps are listed in the brief.
 9. **Output.** The launch video and an interactive brief. Clicking a claim opens its source.
 
 AgentField runs steps 2 to 8. Each stage is its own node in the workflow graph.
@@ -32,19 +33,21 @@ flowchart LR
     R[Research: 12 agents<br/>Tavily + Nosana Qwen] --> S[Script<br/>Nosana Qwen]
     S --> V[Voice<br/>Nosana GPU, Kokoro]
     V --> C[Compose<br/>local code, Hyperframes]
-    C --> K[Code<br/>CodeAF on Ollama Cloud]
-    K --> D[Render<br/>Daytona sandbox]
-    D --> G{Buyer gate<br/>Nosana Qwen}
+    R -. brand profile .-> K[Code: brand theme<br/>CodeAF on Ollama Cloud]
+    K -. theme.css .-> C
+    C --> D[Render<br/>Daytona sandbox]
+    S --> G{Buyer gate<br/>Nosana Qwen}
     G -- reject: cut 2 --> S
   end
-  G -- approve --> OUT[Launch video + interactive brief]
+  D --> OUT[Launch video + interactive brief]
+  G -- approve, or approve with gaps --> OUT
 ```
 
 ## Innovation
 
-- The video is reviewed by an agent that plays the local buyer, not by the author. For Japan the persona is the head of IT at a large enterprise. It scores four questions from the market pack and rejects the cut if any score is below 0.7 (`buyer_gate` in [`launchlocal/script.py`](launchlocal/script.py)).
+- The video is reviewed by an agent that plays the local buyer, not by the author. For Japan the persona is the head of IT at a large enterprise. It scores four questions from the market pack; 0.7 is the pass mark (`buyer_gate` in [`launchlocal/script.py`](launchlocal/script.py)). The gate separates what the video can fix from what only the vendor can fix: missing local proof with no fact to cite becomes a listed gap, not an endless rejection.
 - A rejection changes the product. The gate's reasons go to `revise_script`, and the pipeline produces cut 2 (`_flow` in [`launchlocal/agents.py`](launchlocal/agents.py)).
-- A coding agent styles the video. CodeAF edits the composition's files, and the result is kept only if the text and the `data-scene` / `data-fact-id` attributes are unchanged (`fingerprint` in [`launchlocal/coder.py`](launchlocal/coder.py)).
+- A coding agent styles the video. CodeAF writes the theme stylesheet in a scratch copy of the composition, and the theme is applied only if it is CSS-only, has no network dependencies, hides nothing and passes the Hyperframes lint (`build_theme` and `theme_passes_lint` in [`launchlocal/coder.py`](launchlocal/coder.py)).
 
 ## Real-World Impact
 
@@ -63,7 +66,7 @@ flowchart LR
 | Partner | Job | Why the product breaks without it | Where in the code |
 |---------|-----|-----------------------------------|-------------------|
 | AgentField | Control plane. Runs each pipeline stage as its own node and shows the workflow graph. | No record of which agent did what, and no graph of the two passes. | [`launchlocal/agents.py`](launchlocal/agents.py): `build_app` registers one reasoner per stage; `launch_flow` calls each with `app.call`; `launch` posts to the control plane's execute endpoint. |
-| CodeAF | Coding harness. Runs headless on an Ollama Cloud model and rewrites the composition's styling to match the brand. | The video keeps the baseline look and does not match the official site. | [`launchlocal/coder.py`](launchlocal/coder.py): `_run_codeaf` runs `codeaf exec`; `restyle_composition` checks and keeps or restores the result. |
+| CodeAF | Coding harness. Runs headless on an Ollama Cloud model and writes the theme stylesheet that makes the video look like the official site. | The video keeps the baseline look and does not match the official site. | [`launchlocal/coder.py`](launchlocal/coder.py): `_run_codeaf` runs `codeaf exec`; `build_theme` writes `theme.css` in a scratch copy and checks it; `theme_passes_lint` lints the real composition with the theme applied. [`launchlocal/compose.py`](launchlocal/compose.py) appends the theme. |
 | Tavily | Map, extract and search for 12 parallel research agents: 5 on the official site, 7 on the target market. | No sourced facts, so the script has nothing it is allowed to say. | [`launchlocal/research.py`](launchlocal/research.py): `run_research` and its inner `call`, which invokes `map`, `extract` and `search` on `AsyncTavilyClient`. |
 | Nosana (hosted inference) | Qwen extracts facts, writes the script and the design brief, and plays the buyer gate. | No facts, no script and no review. | [`launchlocal/llm.py`](launchlocal/llm.py): `chat`, `chat_json`. [`launchlocal/script.py`](launchlocal/script.py): `write_script`, `_design_brief`, `buyer_gate`, `revise_script`. [`launchlocal/research.py`](launchlocal/research.py): `_Model.ask`. |
 | Nosana (GPU deployment) | Runs the Kokoro voice model that narrates each scene. | The video has no narration. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployment: [`docs/nosana-voice.md`](docs/nosana-voice.md). |
@@ -114,7 +117,7 @@ Run single stages against a run directory:
 ```sh
 .venv/bin/python -m launchlocal.voice <run_id> [market]
 .venv/bin/python -m launchlocal.compose <run_id>
-.venv/bin/python -m launchlocal.coder <run_id> [market]
+.venv/bin/python -m launchlocal.coder <run_id> [market] --theme
 .venv/bin/python -m launchlocal.render <run_id>
 ```
 
@@ -128,7 +131,7 @@ Live path: Tavily, Nosana hosted inference, the Nosana GPU voice deployment, Cod
 |----------|-----------------|--------------|
 | Local voice | The Nosana voice endpoint fails | `voice.py` runs the same Kokoro model on the local CPU and logs `fallback: true`. |
 | Local render | `LAUNCHLOCAL_RENDER=local` is set | `render.py` renders with the same pinned Hyperframes CLI on the local machine. `render.json` has `preview_url: null` and `sandbox_id: null`. It is never chosen silently. |
-| Baseline composition | CodeAF fails, changes text or fact attributes, or the result fails lint | `coder.py` restores the baseline composition and logs `baseline kept: <reason>`. The run continues. |
+| Baseline look | CodeAF fails or times out, its theme uses the network or hides elements, or the composition fails lint with the theme | `coder.py` sets the theme aside and logs `baseline look kept: <reason>`. The video renders with the baseline stylesheet and the run continues. |
 | Pipeline without AgentField | The control plane or the agent node is unreachable | `launch` in `agents.py` runs the same stages in process with `run_pipeline` and logs it. |
 | Cached-run replay | A recorded run is opened with `?replay=1` | The server replays the recorded `events.jsonl`. The page shows a "CACHED RUN" badge. |
 
