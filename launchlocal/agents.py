@@ -26,13 +26,11 @@ STAGES = {
     "strategist_revise": ("strategist", "Strategist: applying the buyer gate's fixes"),
     "voice": ("voice", "Voice: synthesizing narration on Nosana"),
     "composer": ("art_director", "Composer: building the baseline Hyperframes composition"),
-    "coder": ("coder", "Coder: CodeAF restyles the composition to the brand"),
+    "coder": ("coder", "Coder: CodeAF writes the brand theme (runs in parallel with script and voice)"),
     "renderer": ("renderer", "Renderer: rendering the video on Daytona"),
     "buyer_gate": ("gate", "Buyer gate: the local buyer persona reviews the cut"),
 }
-# (stage, cut) in contract order; the second pass only runs when the gate rejects cut 1
-PASS_1 = ["scout_research", "market_research", "strategist_script", "voice", "composer", "coder", "renderer", "buyer_gate"]
-PASS_2 = ["strategist_revise", "voice", "composer", "coder", "renderer", "buyer_gate"]
+THEME_WAIT_S = float(os.environ.get("LAUNCHLOCAL_THEME_WAIT", "20"))  # how long a cut waits for the CodeAF theme
 
 
 def _module(name: str, rd):
@@ -77,9 +75,14 @@ async def run_stage(stage: str, run_id: str, market: str = "ja-JP", cut: int = 1
         elif stage == "composer":
             if m := _module("compose", rd):
                 out = {"composition": str(await asyncio.to_thread(m.build_baseline, rd, pack))}
+                if (rd / "theme.css").exists():  # CodeAF's theme was appended: lint it, drop it if it breaks the composition
+                    from . import coder
+                    if not await asyncio.to_thread(coder.theme_passes_lint, rd):
+                        await asyncio.to_thread(m.build_baseline, rd, pack)
+                out["themed"] = (rd / "theme.css").exists()
         elif stage == "coder":
             if m := _module("coder", rd):
-                out = await asyncio.to_thread(m.restyle_composition, rd, pack)
+                out = await asyncio.to_thread(m.build_theme, rd, pack)
         elif stage == "renderer":
             if m := _module("render", rd):
                 out = await asyncio.to_thread(m.render, rd, cut)
@@ -99,25 +102,47 @@ async def run_stage(stage: str, run_id: str, market: str = "ja-JP", cut: int = 1
 
 
 async def _flow(run_id: str, market: str, step) -> dict:
-    """research -> script -> voice -> compose -> coder -> render -> gate, one revise pass on reject."""
+    """research -> [CodeAF theme in parallel] -> script -> (buyer gate | voice -> compose -> render), one revise pass on reject."""
     rd = common.run_dir(run_id)
-    gate = {}
-    for cut, stages in ((1, PASS_1), (2, PASS_2)):
-        for stage in stages:
-            try:
-                res = await step(stage, cut)
-            except Exception as e:
-                if stage != "coder":
-                    raise
-                # coder is cosmetic: the baseline composition is still there, so keep going
-                common.emit(rd, "system", "log", f"coder stage failed, baseline composition kept: {e}"[:300])
-                continue
-            if stage == "buyer_gate":
-                gate = res or {}
+
+    async def theme():
+        try:
+            for _ in range(120):  # CodeAF needs only brand.json, which research writes within its first seconds
+                if (rd / "brand.json").exists():
+                    break
+                await asyncio.sleep(0.5)
+            return await step("coder", 1)
+        except Exception as e:  # the theme is cosmetic: the baseline look is still there
+            common.emit(rd, "system", "log", f"coder stage failed, baseline look kept: {e}"[:300])
+
+    async def produce(cut: int) -> bool:
+        """voice -> compose -> render. True when CodeAF's theme was in this render."""
+        await step("voice", cut)
+        if not theme_task.done():
+            await asyncio.wait([theme_task], timeout=THEME_WAIT_S)
+        themed = bool((await step("composer", cut) or {}).get("themed"))
+        await step("renderer", cut)
+        return themed
+
+    theme_task = asyncio.ensure_future(theme())  # runs beside research, script and voice
+    await step("scout_research", 1)
+    await step("market_research", 1)
+    gate, themed, cut = {}, False, 1
+    for cut in (1, 2):
+        await step("strategist_script" if cut == 1 else "strategist_revise", cut)
+        # the gate reviews the script, so it runs while the cut is voiced and rendered
+        gate, themed = await asyncio.gather(step("buyer_gate", cut), produce(cut))
+        gate = gate or {}
         if gate.get("verdict") != "reject":
             break
-    common.emit(rd, "system", "done", "run complete", run_id=run_id, verdict=gate.get("verdict"), cut=gate.get("cut", 1))
-    return {"run_id": run_id, "verdict": gate.get("verdict"), "cut": gate.get("cut", 1)}
+    if not themed:
+        if not theme_task.done():
+            common.emit(rd, "system", "log", "cut rendered with the baseline look; waiting for CodeAF's theme to re-render")
+        await theme_task
+        if (rd / "theme.css").exists() and (await step("composer", cut) or {}).get("themed"):
+            await step("renderer", cut)
+    common.emit(rd, "system", "done", "run complete", run_id=run_id, verdict=gate.get("verdict"), cut=cut)
+    return {"run_id": run_id, "verdict": gate.get("verdict"), "cut": cut}
 
 
 def _init_run(url: str, market: str, run_id: str | None) -> str:

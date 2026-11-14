@@ -1,11 +1,92 @@
+/*
+ Baseline look for the LaunchLocal video. Restyle freely; keep the class names.
+ Variables (set per brand above this file): --background --surface --text --muted --primary --accent
+   --on-primary (readable text on --primary) --font-heading --font-body. html[data-theme] is "light" or "dark".
+ Classes:
+   .scene                 one full-frame scene; also .scene-hook | .scene-product | .scene-proof | .scene-cta
+   .scene.has-visual      product scene that has a site image (two columns); without it, type only
+   header, .logo, .brand-name (stands in when there is no logo file), .scene-number
+   main, .copy            content area and its text column
+   .headline              scene headline; .len-s | .len-m | .len-l | .len-xl set its size by text length
+   .claims, .claim        sourced points; .claim-index, .claim-text, .source-chip inside each
+   .visual, .browser-bar, .browser-url, .visual-frame, .visual-image   browser-window frame around the site image
+   .cta-logo, .cta-url    closing scene; the button is .scene-cta .claim-text
+   .caption               burned-in narration
+   .rule                  progress line at the bottom of each scene
+   .anim                  elements the timeline fades and slides in (do not set opacity or transform on these)
+ Motion lives in index.html's timeline, not here. Avoid filters, masks and large shadows: they slow the render.
+*/
 @font-face{font-family:"Noto Sans JP";src:url("assets/fonts/NotoSansJP.ttf") format("truetype");font-weight:100 900;font-display:block}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body,#root{width:1280px;height:720px;overflow:hidden;background:var(--background);color:var(--text);font-family:var(--font-body)}
-.scene{position:absolute;inset:0;padding:40px 64px;background:var(--background)}
-header{height:58px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--surface);padding-bottom:18px}
-.logo{max-width:140px;max-height:36px;object-fit:contain}.brand-name{font-family:var(--font-heading);font-size:26px;font-weight:800}.scene-number{margin-left:auto;font-size:16px;color:var(--muted)}
-main{padding-top:46px}h1{font-family:var(--font-heading);font-size:48px;line-height:1.45;font-weight:700;max-width:1100px;letter-spacing:-.025em;margin-bottom:28px}
-.claim{position:relative;display:flex;align-items:center;gap:22px;margin-top:16px;padding:14px 20px;background:var(--surface);border-left:4px solid var(--primary);width:fit-content;max-width:1110px}
-.claim-text{font-size:27px;font-weight:600;line-height:1.5}.source-chip{font-size:14px;line-height:1.4;color:var(--muted);border:1px solid var(--muted);padding:4px 10px;border-radius:4px;max-width:260px}
-.caption{position:absolute;left:64px;right:64px;bottom:52px;font-size:23px;line-height:1.65;color:var(--text);border-top:1px solid var(--surface);padding-top:18px}
-.rule{position:absolute;left:64px;bottom:25px;width:72px;height:4px;background:var(--primary)}
+html,body,#root{width:1280px;height:720px;overflow:hidden;background:var(--background);color:var(--text);font-family:var(--font-body);font-weight:500}
+/* Japanese breaks only between phrases, never inside a word; long Latin strings may still wrap. */
+#root{word-break:auto-phrase;line-break:strict;overflow-wrap:anywhere}
+
+.scene{position:absolute;inset:0;padding:36px 64px 0;display:flex;flex-direction:column;
+  background:
+    radial-gradient(900px 520px at 92% -12%,color-mix(in srgb,var(--primary) 24%,transparent),transparent 70%),
+    radial-gradient(720px 460px at -4% 112%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%),
+    linear-gradient(color-mix(in srgb,var(--text) 5%,transparent) 1px,transparent 1px) 0 0/64px 64px,
+    linear-gradient(90deg,color-mix(in srgb,var(--text) 5%,transparent) 1px,transparent 1px) 0 0/64px 64px,
+    var(--background)}
+header{height:44px;flex:none;display:flex;align-items:center;gap:16px}
+.logo{max-width:180px;max-height:40px;object-fit:contain}
+.brand-name{font-family:var(--font-heading);font-size:28px;font-weight:800;letter-spacing:-.01em}
+.scene-number{margin-left:auto;font-size:15px;letter-spacing:.08em;color:var(--muted);font-variant-numeric:tabular-nums}
+
+main{flex:1;min-height:0;display:flex;align-items:center;gap:48px;padding:20px 0 150px}
+.copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:26px}
+.headline{font-family:var(--font-heading);font-weight:700;line-height:1.3;letter-spacing:-.01em;text-wrap:balance}
+.headline.len-s{font-size:64px}.headline.len-m{font-size:56px}.headline.len-l{font-size:46px}.headline.len-xl{font-size:38px}
+
+.claims{display:flex;flex-direction:column;gap:14px}
+.claim{display:flex;align-items:center;gap:16px;padding:14px 20px;background:var(--surface);border:1px solid color-mix(in srgb,var(--text) 10%,transparent);border-left:4px solid var(--primary);border-radius:10px}
+.claim-index{font-size:15px;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums}
+.claim-text{flex:1;min-width:0;font-size:28px;font-weight:600;line-height:1.5}
+.source-chip{flex:none;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;line-height:1.4;color:var(--muted);border:1px solid color-mix(in srgb,var(--muted) 55%,transparent);padding:4px 12px;border-radius:999px}
+
+/* hook: one large line that fills the frame */
+.scene-hook .headline.len-s{font-size:104px}.scene-hook .headline.len-m{font-size:84px}.scene-hook .headline.len-l{font-size:68px}.scene-hook .headline.len-xl{font-size:54px}
+.scene-hook .headline{line-height:1.25}
+.scene-hook .claims{flex-direction:row;flex-wrap:wrap}
+.scene-hook .claim{background:transparent;border:0;border-left:4px solid var(--primary);border-radius:0;padding:4px 0 4px 18px}
+.scene-hook .claim-index{display:none}.scene-hook .claim-text{flex:none;font-size:30px}
+
+/* product: points beside the site in a browser window, or type only */
+.scene-product.has-visual .copy{flex:0 0 520px}
+.scene-product.has-visual .headline.len-s{font-size:54px}.scene-product.has-visual .headline.len-m{font-size:46px}.scene-product.has-visual .headline.len-l{font-size:38px}.scene-product.has-visual .headline.len-xl{font-size:32px}
+.scene-product.has-visual .claim{flex-wrap:wrap;gap:6px 14px}.scene-product.has-visual .claim-text{font-size:24px}
+.scene-product:not(.has-visual) .claim-text{font-size:34px}
+.visual{flex:1;min-width:0;border:1px solid color-mix(in srgb,var(--text) 16%,transparent);border-radius:12px;overflow:hidden;background:var(--surface)}
+.browser-bar{height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:1px solid color-mix(in srgb,var(--text) 12%,transparent)}
+.browser-bar i{width:10px;height:10px;border-radius:50%;background:color-mix(in srgb,var(--text) 24%,transparent)}
+.browser-url{margin-left:12px;flex:1;font-size:13px;color:var(--muted);background:color-mix(in srgb,var(--text) 7%,transparent);border-radius:6px;padding:2px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.visual-frame{aspect-ratio:16/9;overflow:hidden}
+.visual-image{display:block;width:100%;height:100%;object-fit:cover;object-position:top center;transform-origin:50% 0}
+
+/* proof: sourced points as cards */
+.scene-proof .claims{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:20px}
+.scene-proof .claim{min-width:0}
+.scene-proof .claim{flex-direction:column;align-items:flex-start;gap:14px;padding:24px 26px;border-left:1px solid color-mix(in srgb,var(--text) 10%,transparent);border-top:4px solid var(--primary);min-height:190px}
+.scene-proof .claim-index{font-size:18px}
+.scene-proof .claim-text{flex:1;font-size:32px;line-height:1.45}
+.scene-proof .claims.count-1 .claim-text,.scene-proof .claims.count-2 .claim-text{font-size:36px}
+.scene-proof .source-chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* cta: logo, button, URL */
+.scene-cta .copy{align-items:center;text-align:center;gap:22px}
+.cta-logo{max-width:340px;max-height:84px;object-fit:contain}
+.cta-logo.brand-name{font-size:64px;max-height:none}
+.scene-cta .headline.len-s,.scene-cta .headline.len-m{font-size:46px}.scene-cta .headline.len-l{font-size:38px}.scene-cta .headline.len-xl{font-size:32px}
+.scene-cta .claims{align-items:center}
+.scene-cta .claim{flex-direction:column;gap:12px;background:transparent;border:0;padding:0}
+.scene-cta .claim-index{display:none}
+.scene-cta .claim-text{flex:none;font-size:34px;font-weight:700;line-height:1.3;padding:16px 56px;border-radius:12px;background:var(--primary);color:var(--on-primary)}
+.cta-url{font-size:26px;font-weight:600;letter-spacing:.02em;color:var(--muted)}
+.scene-cta main{padding-bottom:120px}
+
+.caption{position:absolute;left:64px;right:64px;bottom:34px;font-size:22px;line-height:1.6;color:var(--text);border-top:1px solid color-mix(in srgb,var(--text) 14%,transparent);padding-top:14px;text-wrap:pretty}
+.rule{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--primary);transform-origin:0 50%}
+/* three or more cards are narrow: smaller type keeps a long katakana word on one line */
+.scene-proof .claims:not(.count-1):not(.count-2) .claim-text{font-size:24px}
+.scene-proof .claims:not(.count-1):not(.count-2) .claim{min-height:150px;padding:20px 22px}

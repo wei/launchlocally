@@ -4,6 +4,7 @@ CLI: python -m launchlocal.coder <run_id> [market]
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -15,7 +16,8 @@ from pathlib import Path
 
 from . import common
 
-MODEL = os.environ.get("LAUNCHLOCAL_CODEAF_MODEL", "glm-5.3")  # Ollama Cloud slug
+# Ollama Cloud slug. Measured on the theme task: kimi-k2.7-code 62s, deepseek-v4.1-flash 82s, glm-5.3-flash 149s, glm-5.3 172s.
+MODEL = os.environ.get("LAUNCHLOCAL_CODEAF_MODEL", "kimi-k2.7-code")
 BASE_URL = "https://ollama.com/v1"
 CAP_S = 240  # hard wall for the CodeAF run
 _SKIP = {"node_modules", ".git", ".codeaf"}  # .codeaf is CodeAF's own scratch
@@ -230,6 +232,93 @@ def restyle_composition(run_dir: Path, pack: dict) -> dict:
     return out
 
 
+def theme_brief(run_dir: Path, pack: dict) -> str:
+    brand = common.read_json(run_dir / "brand.json")
+    script = run_dir / "script.json"
+    design = common.read_json(script).get("design_brief", {}) if script.exists() else {}
+    rules = "\n".join(f"- {r}" for r in pack.get("style_rules", []))
+    return f"""This directory is a Hyperframes video composition (index.html, styles.css, GSAP) for a product
+launch video. Write ONE new file, theme.css: a CSS override stylesheet that is appended after styles.css, so the
+video looks like the official website of {brand.get('name', 'the product')} ({brand.get('url', '')}), adapted to
+the conventions of the {pack.get('label', pack.get('id', 'target'))} market.
+
+Brand colors: {json.dumps(brand.get('colors', {}), ensure_ascii=False)}
+Brand fonts: {json.dumps(brand.get('fonts', {}), ensure_ascii=False)}
+Brand tone: {brand.get('tone', '')}
+Design brief: {json.dumps(design, ensure_ascii=False)}
+Market style rules:
+{rules}
+
+Hard rules:
+- Read styles.css (its top comment lists the class names you may restyle) and index.html, then write theme.css.
+- Create or edit theme.css only. Do not change any other file.
+- CSS only: selectors that already exist in styles.css or index.html. Colors, backgrounds, borders, radii,
+  shadows, spacing, type sizes and weights. Do not hide elements, do not set display:none, do not change
+  positions in a way that makes text overlap or leave the 1280x720 frame.
+- No @import, no url() pointing at the network, no new fonts. Use the CSS variables already defined in :root.
+- Keep text readable: strong contrast between text and its background on every scene.
+- Never run git, npm, npx or a browser. Aim to finish within 4 tool calls and end with a two-line summary.
+"""
+
+
+def build_theme(run_dir: Path, pack: dict) -> dict:
+    """CodeAF writes run_dir/theme.css in a scratch copy of the composition.
+
+    It needs only brand.json, so it runs in parallel with script and voice; compose.build_baseline appends
+    theme.css when it exists. Nothing is written to the run dir unless every check passes.
+    """
+    from . import compose
+
+    run_dir = Path(run_dir)
+    ws = run_dir / "theme_ws"
+    shutil.rmtree(ws, ignore_errors=True)
+    ws.mkdir(parents=True)
+    shutil.copy2(run_dir / "brand.json", ws / "brand.json")
+    for name in ("script.json", "facts.json"):  # sample content; the theme depends on structure, not on text
+        shutil.copy2(common.RUNS / "fixture" / name, ws / name)
+    if (run_dir / "assets").is_dir():
+        shutil.copytree(run_dir / "assets", ws / "assets", ignore=shutil.ignore_patterns("capture"))
+    comp = compose.build_baseline(ws, pack)
+    common.emit(run_dir, "coder", "start", f"CodeAF writing the brand theme with {MODEL} on Ollama Cloud", model=MODEL)
+    t0 = time.time()
+    problem, css = "", ""
+    try:
+        res = _run_codeaf(run_dir, comp, theme_brief(run_dir, pack))
+        theme = comp / "theme.css"
+        if theme.is_file():
+            css = theme.read_text(encoding="utf-8")
+        if not res.get("ok") and not css:
+            problem = f"CodeAF did not finish ({res.get('stop')}): {res.get('error') or res.get('incomplete') or ''}"
+        elif len(css.strip()) < 200 or "{" not in css:
+            problem = "CodeAF wrote no usable theme.css"
+        elif any(bad in re.sub(r"/\*.*?\*/", "", css, flags=re.S).lower()  # comments may mention the rules
+                 for bad in ("@import", "http://", "https://", "display:none", "display: none")):
+            problem = "theme.css uses the network or hides elements"
+    except Exception as e:
+        problem = f"CodeAF failed: {e}"
+    seconds = round(time.time() - t0, 1)
+    if problem:
+        common.emit(run_dir, "coder", "log", f"baseline look kept: {problem}"[:500], kept_baseline=True)
+    else:
+        (run_dir / "theme.css").write_text(css, encoding="utf-8")
+        common.emit(run_dir, "coder", "artifact", f"theme.css ({len(css.splitlines())} lines)", path="theme.css")
+    out = {"changed_files": [] if problem else ["theme.css"], "model": MODEL, "seconds": seconds, "kept_baseline": bool(problem)}
+    common.emit(run_dir, "coder", "done", f"brand theme {'kept baseline' if problem else 'written'} in {seconds}s", **out)
+    return out
+
+
+def theme_passes_lint(run_dir: Path) -> bool:
+    """After compose applied theme.css: lint the real composition. On failure the theme is set aside."""
+    run_dir = Path(run_dir)
+    ok, tail = _lint(run_dir / "composition")
+    if not ok:
+        (run_dir / "theme.css").replace(run_dir / "theme.rejected.css")
+        common.emit(run_dir, "coder", "log", f"baseline look kept: hyperframes lint failed with the theme: {tail}"[:500], kept_baseline=True)
+    return ok
+
+
 if __name__ == "__main__":
     rid = sys.argv[1]
-    print(json.dumps(restyle_composition(common.run_dir(rid), common.load_pack(sys.argv[2] if len(sys.argv) > 2 else "ja-JP"))))
+    fn = build_theme if "--theme" in sys.argv else restyle_composition
+    market = next((a for a in sys.argv[2:] if not a.startswith("--")), "ja-JP")
+    print(json.dumps(fn(common.run_dir(rid), common.load_pack(market))))
