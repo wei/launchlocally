@@ -1,0 +1,140 @@
+{
+  "id": "en-US",
+  "label": "United States",
+  "direction": "Japanese product launching globally in English",
+  "language": "en",
+  "language_name": "English",
+  "country": "united states",
+  "currency": "USD",
+  "voice": {
+    "backend": "kokoro",
+    "voice": "af_heart",
+    "lang_code": "en-us",
+    "speed": 1.0
+  },
+  "fonts": {
+    "heading": "Inter",
+    "body": "Inter"
+  },
+  "search": {
+    "country": "united states",
+    "local_sites": [
+      "techcrunch.com",
+      "news.ycombinator.com",
+      "producthunt.com",
+      "g2.com",
+      "theverge.com",
+      "infoq.com"
+    ]
+  },
+  "research_areas": [
+    {
+      "id": "competitors",
+      "label": "US competitors",
+      "queries": [
+        "best {category} tools 2026",
+        "{product} alternatives"
+      ]
+    },
+    {
+      "id": "local_pricing",
+      "label": "US pricing",
+      "queries": [
+        "{category} pricing per month USD",
+        "{product} pricing"
+      ]
+    },
+    {
+      "id": "vocabulary",
+      "label": "Buyer vocabulary",
+      "queries": [
+        "what is {category}",
+        "{category} use cases engineering teams"
+      ]
+    },
+    {
+      "id": "trust",
+      "label": "Trust and compliance",
+      "queries": [
+        "{product} SOC 2 security compliance",
+        "{category} security GDPR data residency"
+      ]
+    },
+    {
+      "id": "presence",
+      "label": "Existing global presence",
+      "queries": [
+        "{product} customers case study",
+        "{product} English review"
+      ]
+    },
+    {
+      "id": "style",
+      "label": "Local marketing style",
+      "queries": [
+        "best SaaS landing pages 2026 {category}",
+        "B2B SaaS homepage headline best practices"
+      ]
+    },
+    {
+      "id": "news",
+      "label": "Current news",
+      "queries": [
+        "{category} news 2026",
+        "{product} launch funding 2026"
+      ]
+    }
+  ],
+  "copy_rules": [
+    "Write plain, confident American English. Active voice, second person (you, your team).",
+    "Lead with the benefit, not the feature or the company history. The headline states the outcome in under 8 words.",
+    "One idea per scene. Cut qualifiers, filler and corporate phrasing; no 'cutting-edge', 'revolutionary' or 'world-class' unless a source says it.",
+    "Use specific numbers and named customers when sourced; prices in USD only if a source gives them.",
+    "Write the product name exactly as the brand writes it in Latin letters.",
+    "Keep each narration line under 18 words so it reads in about 5 seconds.",
+    "End with a direct, action-first call to action such as 'Start free' or 'Book a demo'."
+  ],
+  "style_rules": [
+    "Sparser than a Japanese page: one bold headline and at most two short supporting points per scene, lots of whitespace.",
+    "Bold, large headline (88 to 110px, weight 800) with tight tracking; supporting text 36px, weight 500.",
+    "Use the brand's own colors with one accent color for emphasis; Inter for all text.",
+    "Show proof as a single strong number, logo strip or quote rather than a list.",
+    "Confident, snappy motion: 250 to 400ms eases, quick cuts, no clutter.",
+    "End on the logo, a single call-to-action button and the URL."
+  ],
+  "cta_examples": [
+    "Start free",
+    "Book a demo",
+    "Get started"
+  ],
+  "buyer_persona": {
+    "title_local": "VP of Engineering",
+    "title_en": "VP of Engineering at a US technology company",
+    "gate_name": "Buyer review",
+    "cares_about": [
+      "Clear outcome for the engineering team in one sentence",
+      "Security and compliance evidence such as SOC 2",
+      "Credible proof: customers, adoption, benchmarks from named sources",
+      "Transparent pricing and an easy way to try it",
+      "No fluff, hype or awkward translated English"
+    ],
+    "questions": [
+      {
+        "id": "tone",
+        "q": "Does it read like native, confident US B2B copy with no hype or translation artifacts?"
+      },
+      {
+        "id": "trust",
+        "q": "Are security, compliance or reliability concerns addressed with evidence?"
+      },
+      {
+        "id": "local_proof",
+        "q": "Is there proof that matters to a US buyer, such as named customers, adoption, benchmarks or USD pricing?"
+      },
+      {
+        "id": "clarity",
+        "q": "Is it clear in seconds what the product does for my team and what to do next?"
+      }
+    ]
+  }
+}
