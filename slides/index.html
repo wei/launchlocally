@@ -23,7 +23,7 @@ html,body{height:100%;background:#000;color:var(--text);
 .slide{position:absolute;inset:0;padding:2.5em 4em 3.2em;display:flex;flex-direction:column;
   visibility:hidden;line-height:1.45}
 .slide.on{visibility:visible}
-.slide::after{content:attr(data-n) " / 10";position:absolute;right:2em;bottom:1.1em;
+.slide::after{content:attr(data-n) " / 9";position:absolute;right:2em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-variant-numeric:tabular-nums}
 .slide::before{content:"LaunchLocally";position:absolute;left:4em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-weight:700;letter-spacing:.02em}
@@ -86,18 +86,6 @@ b,.acc{color:var(--accent);font-weight:700}
 .pill{font-size:.9em;font-weight:700;color:#14161a;border-radius:1em;padding:.1em .8em;white-space:nowrap}
 .s4 img{flex:1;min-height:0;width:100%;object-fit:contain}
 
-/* 5 table */
-.s4b{padding-top:1.8em}
-.s4b h2{font-size:2em}
-.s4b h2 + .jp{font-size:1.15em;margin-top:.2em;padding-bottom:.4em}
-.s4b .body{justify-content:flex-start;padding-top:.7em}
-table{width:100%;border-collapse:collapse;table-layout:fixed}
-td{text-align:left;vertical-align:middle;padding:.42em .8em;border-bottom:.06em solid var(--line);
-  font-size:1.15em;font-weight:700;line-height:1.3}
-td .jp{display:block;font-size:1em;margin-top:.1em;line-height:1.4}
-td.p{width:20%}
-td.p .pill{font-size:1em}
-tr:last-child td{border-bottom:0}
 
 /* 5 honest */
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:1.1em}
@@ -108,12 +96,17 @@ tr:last-child td{border-bottom:0}
 .s6{padding-top:1.8em}
 .s6 h2{font-size:2em}
 .s6 h2 + .jp{font-size:1.15em;margin-top:.2em;padding-bottom:.4em}
-.s6 .cols3{gap:.8em}
-.s6 .card{padding:.7em 1em}
-.s6 .card h3{font-size:1.15em}
-.s6 .card h3 .jp{font-size:.8em;margin-left:.4em}
-.s6 ul{list-style:none;margin-top:.35em}
-.s6 li{font-size:.9em;line-height:1.4;padding:.22em 0;border-top:.06em solid var(--line)}
+.s6 .body{justify-content:flex-start;padding-top:.6em}
+.s6 .card{padding:.6em 1em}
+.s6 .card h3{font-size:1.2em;color:var(--accent)}
+.s6 .card h3 .jp{font-size:.8em;margin-left:.5em}
+.s6 ul{list-style:none;margin-top:.3em}
+.s6 li{display:grid;grid-template-columns:7em 1fr;gap:.8em;align-items:center;font-size:1.05em;font-weight:700;
+  line-height:1.3;padding:.36em 0;border-top:.06em solid var(--line)}
+.s6 li .pill{justify-self:start}
+.s6 code{font-family:ui-monospace,Menlo,monospace;font-size:.92em;color:var(--accent)}
+.s6 .oss{margin-top:.7em;font-size:.85em;line-height:1.5;color:var(--dim)}
+.s6 .oss b{color:inherit;font-weight:700;margin-right:.5em}
 
 /* dogfood video */
 .s9{padding-top:1.8em}
@@ -235,71 +228,38 @@ tr:last-child td{border-bottom:0}
   <img src="../architecture.svg" alt="LaunchLocally architecture: a product URL and a market pack enter the AgentField control plane, which runs research (Tavily, Nosana Qwen), script (Nosana Qwen), voice (Nosana GPU), compose, code (CodeAF), render (Daytona) and the buyer gate (Nosana Qwen). A rejected cut loops back to the script as cut 2. Output: launch video and interactive brief.">
 </section>
 
-<section class="slide s4b" data-n="5">
-  <h2>What breaks without it</h2>
-  <p class="jp">ない場合に起きること</p>
+<section class="slide s6" data-n="5">
+  <h2>Partner SDKs and open source we build on</h2>
+  <p class="jp">利用しているパートナーSDKとオープンソース</p>
   <div class="body">
-    <table>
-      <tbody>
-        <tr><td class="p"><span class="pill" style="background:#38bdf8">Tavily</span></td>
-          <td>No sourced facts. The video is only a translation.
-            <span class="jp">出典付きの事実がなくなり、動画は翻訳だけになります。</span></td></tr>
-        <tr><td class="p"><span class="pill" style="background:#34d399">Nosana</span></td>
-          <td>No script, no review and no narration.
-            <span class="jp">台本、レビュー、ナレーションがすべてなくなります。</span></td></tr>
-        <tr><td class="p"><span class="pill" style="background:#fbbf24">Daytona</span></td>
-          <td>Nowhere safe to run generated code, and no video.
-            <span class="jp">生成されたコードを安全に実行する場所がなく、動画も作れません。</span></td></tr>
-        <tr><td class="p"><span class="pill" style="background:#f472b6">CodeAF</span></td>
-          <td>No restyle. The video does not look like the brand.
-            <span class="jp">スタイルの調整ができず、動画がブランドの見た目に合いません。</span></td></tr>
-        <tr><td class="p"><span class="pill" style="background:#a78bfa">AgentField</span></td>
-          <td>No trace of which agent did what.
-            <span class="jp">どのエージェントが何をしたかの記録が残りません。</span></td></tr>
-      </tbody>
-    </table>
+    <div class="card"><h3>Partner SDKs and tools in the code <span class="jp">コードで使うパートナーのSDKとツール</span></h3>
+      <ul>
+        <li><span class="pill" style="background:#a78bfa">AgentField</span><span>Control plane and Python SDK (<code>agentfield</code>): one node per pipeline stage</span></li>
+        <li><span class="pill" style="background:#f472b6">CodeAF</span><span>Headless <code>codeaf exec</code> writes the video's brand theme</span></li>
+        <li><span class="pill" style="background:#38bdf8">Tavily</span><span>Python SDK (<code>tavily-python</code>): map, extract and search for 12 research agents</span></li>
+        <li><span class="pill" style="background:#fbbf24">Daytona</span><span>Python SDK (<code>daytona</code>): sandbox that renders and serves the video</span></li>
+        <li><span class="pill" style="background:#34d399">Nosana</span><span>REST deployments API for two GPU deployments (Kokoro voice model, vLLM text model), and the hosted OpenAI-compatible inference API</span></li>
+      </ul></div>
+    <p class="oss"><b>Other open source / その他のオープンソース</b>Hyperframes, GSAP, FFmpeg, Chrome Headless Shell, Kokoro, Kokoro-FastAPI, kokoro-onnx, misaki, Noto Sans JP, FastAPI, Uvicorn, httpx, OpenAI Python SDK, uv, qrcode.js</p>
   </div>
 </section>
 
-<section class="slide s6" data-n="6">
-  <h2>Open source we build on</h2>
-  <p class="jp">利用しているオープンソース</p>
-  <div class="body">
-    <div class="cols3">
-      <div class="card"><h3><b>Agents</b> <span class="jp">エージェント</span></h3>
-        <ul><li>AgentField: agent control plane</li><li>CodeAF: coding harness</li></ul></div>
-      <div class="card"><h3><b>Video</b> <span class="jp">動画</span></h3>
-        <ul><li>Hyperframes: HTML compositions rendered to MP4</li><li>GSAP: animation timeline</li><li>FFmpeg, Chrome Headless Shell</li></ul></div>
-      <div class="card"><h3><b>Voice</b> <span class="jp">音声</span></h3>
-        <ul><li>Kokoro: text-to-speech model</li><li>Kokoro-FastAPI: server image on the Nosana GPU</li><li>kokoro-onnx, misaki: local fallback</li></ul></div>
-      <div class="card"><h3><b>Type</b> <span class="jp">書体</span></h3>
-        <ul><li>Noto Sans JP</li></ul></div>
-      <div class="card"><h3><b>App</b> <span class="jp">アプリ</span></h3>
-        <ul><li>FastAPI, Uvicorn, httpx</li><li>OpenAI Python SDK, for OpenAI-compatible endpoints</li><li>tavily-python, Daytona Python SDK</li><li>uv, qrcode.js</li></ul></div>
-      <div class="card"><h3><b>Inspiration</b> <span class="jp">着想</span></h3>
-        <ul><li>The /brag agent skill (latent-spaces/brag)</li><li>LaunchCut, a past Daytona hackathon project</li></ul></div>
-    </div>
-  </div>
-</section>
-
-<section class="slide s5" data-n="7">
+<section class="slide s5" data-n="6">
   <h2>Honest by design</h2>
   <p class="jp">正確さを守る設計</p>
   <div class="body">
-    <div class="cols2">
+    <div class="cols3">
       <div class="card"><h3>Every sentence in the video has a <em>source</em>. Unsourced sentences are dropped.</h3>
         <p class="jp">動画のすべての文に出典があります。出典のない文は削除します。</p></div>
       <div class="card"><h3>Numbers and prices are <em>copied</em> from sources, never generated.</h3>
         <p class="jp">数値と価格は出典からそのまま転記し、生成しません。</p></div>
       <div class="card"><h3>The buyer gate is <em>strict</em>. It can approve or reject.</h3>
         <p class="jp">購入者役の審査は厳格で、承認することも却下することもあります。</p></div>
-      <div class="card"><h3>Cached runs are <em>labelled</em> as cached.</h3>
-        <p class="jp">キャッシュを使った実行には、キャッシュであることを表示します。</p></div>
     </div>
   </div>
 </section>
 
-<section class="slide" data-n="8">
+<section class="slide" data-n="7">
   <h2>Any market</h2>
   <p class="jp">どの市場にも対応できます</p>
   <div class="body">
@@ -327,7 +287,7 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
-<section class="slide s9" data-n="9">
+<section class="slide s9" data-n="8">
   <h2>We launched ourselves with it</h2>
   <p class="jp">自分たちのローンチ動画もLaunchLocallyで作りました</p>
   <div class="body">
@@ -337,7 +297,7 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
-<section class="slide" data-n="10">
+<section class="slide" data-n="9">
   <h2>Links and numbers</h2>
   <p class="jp">リンクと数値</p>
   <div class="body">
