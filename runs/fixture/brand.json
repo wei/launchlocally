@@ -1,0 +1,20 @@
+{
+  "fixture": true,
+  "name": "Daytona",
+  "url": "https://www.daytona.io",
+  "tagline": "Secure infrastructure for running AI-generated code",
+  "category": "AI code execution sandbox",
+  "colors": {
+    "background": "#0a0a0a",
+    "surface": "#161616",
+    "text": "#ffffff",
+    "muted": "#a1a1aa",
+    "primary": "#2ecc71",
+    "accent": "#3b82f6"
+  },
+  "fonts": {"heading": "Inter", "body": "Inter", "mono": "JetBrains Mono"},
+  "logo": {"url": "", "local": ""},
+  "images": [],
+  "screenshots": [],
+  "tone": "developer-first, direct, technical"
+}

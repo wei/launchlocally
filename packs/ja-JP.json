@@ -1,0 +1,56 @@
+{
+  "id": "ja-JP",
+  "label": "Japan",
+  "direction": "International product launching in Japan",
+  "language": "ja",
+  "language_name": "Japanese",
+  "country": "japan",
+  "currency": "JPY",
+  "voice": {"backend": "kokoro", "voice": "jf_alpha", "lang_code": "ja", "speed": 1.0},
+  "fonts": {"heading": "Noto Sans JP", "body": "Noto Sans JP"},
+  "search": {
+    "country": "japan",
+    "local_sites": ["qiita.com", "zenn.dev", "note.com", "prtimes.jp", "itmedia.co.jp", "publickey1.jp"]
+  },
+  "research_areas": [
+    {"id": "competitors", "label": "Local competitors", "queries": ["{category} 国内 サービス 比較", "{product} 競合 日本"]},
+    {"id": "local_pricing", "label": "Local pricing", "queries": ["{category} 料金 比較 円", "{product} 料金 日本円"]},
+    {"id": "vocabulary", "label": "Local vocabulary", "queries": ["{category} とは 開発者", "{product} 使ってみた"]},
+    {"id": "trust", "label": "Trust and compliance", "queries": ["{category} セキュリティ データ 国内 リージョン", "SaaS 導入 稟議 セキュリティチェックシート"]},
+    {"id": "presence", "label": "Existing local presence", "queries": ["{product} 日本 導入事例", "{product} 日本語 対応 パートナー"]},
+    {"id": "style", "label": "Local marketing style", "queries": ["{category} サービス 公式サイト 日本", "BtoB SaaS LP デザイン 日本 特徴"]},
+    {"id": "news", "label": "Current news", "queries": ["{category} 日本 ニュース 2026", "生成AI エージェント 日本 企業 導入 2026"]}
+  ],
+  "copy_rules": [
+    "Write natural business Japanese in です/ます form. No casual forms, no direct translation of English slogans.",
+    "Write the product name in Latin letters on screen; give the katakana reading only in narration.",
+    "Lead with the buyer's concern and concrete proof before the product claim.",
+    "Prefer specific numbers and named sources over superlatives.",
+    "Keep each narration line under 45 Japanese characters so it reads in about 5 seconds."
+  ],
+  "style_rules": [
+    "Higher information density than a US page: headline plus two or three short supporting points per scene.",
+    "Show proof on screen: source names, numbers, customer or partner names when sourced.",
+    "Use the brand's own colors; set Japanese text in Noto Sans JP, bold for headlines.",
+    "Calm, precise motion. No slang, no exaggerated effects."
+  ],
+  "cta_examples": ["無料で試す", "資料請求", "お問い合わせ"],
+  "buyer_persona": {
+    "title_local": "情報システム部 部長",
+    "title_en": "Head of IT at a large Japanese enterprise",
+    "gate_name": "稟議ゲート",
+    "cares_about": [
+      "Japanese-language support and documentation",
+      "Data location and security review",
+      "Local customers, partners or cases",
+      "Clear pricing in yen",
+      "Polite, precise tone with no unsupported claims"
+    ],
+    "questions": [
+      {"id": "tone", "q": "Is the tone appropriate for a Japanese enterprise buyer?"},
+      {"id": "trust", "q": "Are security, data location or support concerns addressed with evidence?"},
+      {"id": "local_proof", "q": "Is there local proof such as Japanese customers, partners, pricing in yen or local sources?"},
+      {"id": "clarity", "q": "Is it clear what the product does and what to do next?"}
+    ]
+  }
+}

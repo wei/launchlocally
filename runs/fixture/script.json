@@ -1,0 +1,98 @@
+{
+  "fixture": true,
+  "market": "ja-JP",
+  "product": "Daytona",
+  "title_local": "Daytona、日本上陸。",
+  "title_en": "Daytona lands in Japan.",
+  "scenes": [
+    {
+      "id": "s1",
+      "role": "hook",
+      "headline_local": "AIが書いたコード、どこで動かしますか。",
+      "headline_en": "Where do you run code written by AI?",
+      "narration_local": "AIエージェントが書いたコードを、本番環境でそのまま動かすのは不安です。",
+      "narration_en": "Running code written by AI agents directly in production is a worry.",
+      "on_screen": [
+        {"text_local": "生成AIの業務利用が拡大", "text_en": "Business use of generative AI is growing", "fact_id": "f07"}
+      ],
+      "fact_ids": ["f07"],
+      "visual": "Dark background, a terminal window typing agent-generated code, a warning marker appears.",
+      "duration_s": 5.0,
+      "audio": "audio/s1.wav"
+    },
+    {
+      "id": "s2",
+      "role": "product",
+      "headline_local": "Daytona：AIコードのための安全なサンドボックス",
+      "headline_en": "Daytona: secure sandboxes for AI code",
+      "narration_local": "デイトナは、AIが生成したコードを隔離された環境で安全に実行します。",
+      "narration_en": "Daytona runs AI-generated code safely in isolated environments.",
+      "on_screen": [
+        {"text_local": "隔離されたサンドボックス", "text_en": "Isolated sandboxes", "fact_id": "f01"},
+        {"text_local": "APIでコマンド実行・ファイル操作", "text_en": "Run commands and manage files by API", "fact_id": "f02"}
+      ],
+      "fact_ids": ["f01", "f02"],
+      "visual": "Product logo, then a sandbox box animating open with code running inside.",
+      "duration_s": 5.0,
+      "audio": "audio/s2.wav"
+    },
+    {
+      "id": "s3",
+      "role": "proof",
+      "headline_local": "日本の開発現場に合う理由",
+      "headline_en": "Why it fits Japanese engineering teams",
+      "narration_local": "国内でも、AIエージェントの安全な実行基盤への関心が高まっています。",
+      "narration_en": "In Japan too, interest in safe execution platforms for AI agents is rising.",
+      "on_screen": [
+        {"text_local": "国内サービスとの比較", "text_en": "Compared with local services", "fact_id": "f04"},
+        {"text_local": "セキュリティチェックに対応", "text_en": "Ready for security review", "fact_id": "f05"}
+      ],
+      "fact_ids": ["f04", "f05"],
+      "visual": "Two columns: local alternatives and Daytona, with sourced points appearing one by one.",
+      "duration_s": 5.0,
+      "audio": "audio/s3.wav"
+    },
+    {
+      "id": "s4",
+      "role": "cta",
+      "headline_local": "まずは無料でお試しください。",
+      "headline_en": "Start with a free trial.",
+      "narration_local": "デイトナを、まずは無料でお試しください。",
+      "narration_en": "Try Daytona free to start.",
+      "on_screen": [
+        {"text_local": "無料で試す", "text_en": "Try it free", "fact_id": "f03"}
+      ],
+      "fact_ids": ["f03"],
+      "visual": "Logo centered, call-to-action button, URL underneath.",
+      "duration_s": 5.0,
+      "audio": "audio/s4.wav"
+    }
+  ],
+  "cta_local": "無料で試す",
+  "cta_en": "Try it free",
+  "cta_url": "https://www.daytona.io",
+  "changes": [
+    {
+      "what_en": "Opened with the buyer's safety concern, not the speed claim.",
+      "what_local": "速度ではなく、安全性への不安から始めました。",
+      "why_en": "Local sources frame AI agent adoption around security review.",
+      "fact_ids": ["f05", "f07"]
+    },
+    {
+      "what_en": "Used polite です/ます narration and a free-trial call to action.",
+      "what_local": "です・ます調のナレーションと「無料で試す」を採用しました。",
+      "why_en": "Japanese B2B pages favor polite tone and low-commitment next steps.",
+      "fact_ids": ["f06"]
+    }
+  ],
+  "design_brief": {
+    "density": "high",
+    "palette": "brand colors from brand.json",
+    "typography": "Noto Sans JP, weight 700 for headlines, 500 for body",
+    "motion": "calm, precise; staggered reveal of proof points",
+    "notes": [
+      "Show a source chip under each on-screen claim.",
+      "Keep the brand logo visible in a corner on every scene."
+    ]
+  }
+}

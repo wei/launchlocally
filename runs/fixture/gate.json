@@ -1,0 +1,27 @@
+{
+  "fixture": true,
+  "persona": {"title_local": "情報システム部 部長", "title_en": "Head of IT at a large Japanese enterprise", "gate_name": "稟議ゲート"},
+  "rounds": [
+    {
+      "cut": 1,
+      "verdict": "reject",
+      "scores": {"tone": 0.72, "trust": 0.31, "local_proof": 0.24, "clarity": 0.81},
+      "reasons": [
+        {"local": "国内での導入事例や日本語サポートについての説明がありません。", "en": "No mention of local cases or Japanese-language support."},
+        {"local": "セキュリティ審査に必要な情報が不足しています。", "en": "Not enough information for a security review."}
+      ],
+      "fixes": [
+        {"scene": "s3", "instruction_en": "Add a sourced point on security review readiness and one on local comparison.", "fact_ids": ["f04", "f05"]}
+      ]
+    },
+    {
+      "cut": 2,
+      "verdict": "approve",
+      "scores": {"tone": 0.84, "trust": 0.78, "local_proof": 0.69, "clarity": 0.86},
+      "reasons": [
+        {"local": "懸念点に根拠付きで回答されています。", "en": "Concerns are answered with evidence."}
+      ],
+      "fixes": []
+    }
+  ]
+}
