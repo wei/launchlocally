@@ -56,11 +56,22 @@ async def run_stage(stage: str, run_id: str, market: str = "ja-JP", cut: int = 1
     try:
         if stage == "scout_research":
             src = os.environ.get("LAUNCHLOCAL_REUSE_RESEARCH_FROM", "")  # a run id whose research is copied, to save Tavily credits
+            if not src and os.environ.get("LAUNCHLOCAL_RESEARCH_CACHE") == "1":
+                # rehearsal mode: reuse the newest finished research for the same URL and market
+                inp = common.read_json(rd / "input.json")
+                same = [d for d in common.RUNS.iterdir() if d != rd and (d / "facts.json").exists() and (d / "video.mp4").exists()
+                        and (d / "input.json").exists() and not d.name.startswith(("dev-", "fixture"))
+                        and {k: common.read_json(d / "input.json").get(k) for k in ("url", "market")} == {k: inp.get(k) for k in ("url", "market")}]
+                src = max(same, key=lambda d: (d / "facts.json").stat().st_mtime).name if same else ""
             if not (rd / "facts.json").exists() and src and (common.RUNS / src / "facts.json").exists():
+                import json
                 import shutil
                 for name in ("facts.json", "brand.json"):
                     shutil.copy2(common.RUNS / src / name, rd / name)
                 shutil.copytree(common.RUNS / src / "assets", rd / "assets", dirs_exist_ok=True)
+                kept = [line for line in (common.RUNS / src / "events.jsonl").read_text(encoding="utf-8").splitlines()
+                        if json.loads(line)["agent"].startswith(("scout.", "market."))]
+                (rd / "research_events.jsonl").write_text("\n".join(kept) + "\n", encoding="utf-8")
             if (rd / "facts.json").exists() and (rd / "brand.json").exists():
                 facts = common.read_json(rd / "facts.json")
                 common.emit(rd, "system", "log", f"CACHED RESEARCH: reusing {len(facts)} facts and the brand profile saved earlier; no Tavily calls in this run",

@@ -115,7 +115,8 @@ def _emit_call(run_dir: Path, path: Path) -> bool:
         if tool in ("edit", "write"):
             text = f"{tool} {args.get('path', '')}"
         elif tool == "sh":
-            text = "$ " + str(args.get("cmd") or args.get("command") or next(iter(args.values()), ""))[:160]
+            cmd = str(args.get("cmd") or args.get("command") or next(iter(args.values()), ""))
+            text = "$ " + re.sub(r"(?:cd\s+)?/\S*/theme_ws/composition/?\s*(?:&&\s*)?", "", cmd)[:160]  # hide the local workspace path
         else:
             text = f"{tool} {json.dumps(args, ensure_ascii=False)[:120]}"
         common.emit(run_dir, "coder", "progress", text, tool=tool, path=args.get("path", ""))
