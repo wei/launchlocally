@@ -32,26 +32,17 @@ PDF with a text layer, if the form or a judge needs a file: https://wei.github.i
 
 ## Partner Technologies Used / 使用したパートナー技術
 
-AgentField + CodeAF, Tavily, Daytona, Nosana (all four, each at code level).
-
-- AgentField: control plane that runs every agent stage and records the workflow graph. CodeAF: coding harness that writes the theme that styles the video like the product's official site.
-- Tavily: map, extract and search across 12 parallel research areas; every fact keeps its source URL and a verbatim excerpt.
-- Daytona: sandbox that renders the agent-written video composition and serves the result.
-- Nosana: hosted Qwen inference writes the script and plays the local buyer; two Nosana GPU deployments run the voice model that narrates the video and a vLLM server that takes over text generation when the hosted catalog has no chat model.
+AgentField + CodeAF, Tavily, Daytona, Nosana. All four partners, each called from code.
+- AgentField: control plane. Each pipeline stage runs as its own node through `app.call`, so every run has a traced workflow graph (launchlocal/agents.py).
+- CodeAF: headless `codeaf exec` writes the theme stylesheet that makes the video look like the product's official site (launchlocal/coder.py).
+- Tavily: map, extract and search feed 12 parallel research agents, 5 on the official site and 7 on the local web. Every fact keeps its source URL and a verbatim excerpt (launchlocal/research.py).
+- Daytona: the Python SDK sandbox renders the HTML video composition to MP4 and serves it (launchlocal/render.py).
+- Nosana: hosted Qwen 3.8 27B writes the script and plays the local buyer. Two GPU deployments created through Nosana's REST API run the Kokoro voice model and a vLLM Qwen2.5-14B backup text model (launchlocal/llm.py, launchlocal/voice.py).
 
 ## What does your agent do? (2-3 sentences) / エージェントの概要(2-3文)
 
-LaunchLocally takes a product URL and a target market (Japan by default) and
-launches the product like a local: 12 research agents read the official site
-and the local web in parallel with Tavily, a strategist on Nosana writes a
-four-scene script in the local language where every sentence carries a source,
-a voice model on a Nosana GPU narrates it, CodeAF styles the video like the
-official site, and a Daytona sandbox renders it. A local buyer agent (for
-Japan, an enterprise IT head reviewing it as a ringi approval) then approves or
-rejects the cut, and the system fixes what was rejected. The result is a launch
-video plus an interactive brief where clicking any claim opens its source, with
-the whole run orchestrated and traced in AgentField.
+Translated launch material fails abroad because local buyers expect local proof, tone and format, so LaunchLocally turns one product URL into a narrated launch video in the local language, made for foreign companies entering Japan. Every sentence must cite one of about 40 facts found by 12 Tavily research agents, and a local buyer agent (for Japan, an enterprise head of IT doing a ringi-style review) can reject the script and trigger a revised cut. It runs in 90 to 160 seconds across AgentField, CodeAF, Daytona and two Nosana GPU deployments, and 7 recorded runs are public, including the four sponsors' own sites and the launch video LaunchLocally made for itself.
 
 ### Japanese version, if a Japanese answer is preferred
 
-LaunchLocallyは、製品のURLと対象市場（標準は日本）を指定するだけで、現地向けのローンチ動画を作成するエージェントです。12の調査エージェントがTavilyで公式サイトと現地のウェブを並行して調べ、Nosana上のモデルが出典付きの台本と音声を作成し、CodeAFが公式サイトに合わせてデザインを整え、Daytonaのサンドボックスで動画をレンダリングします。最後に現地の購買担当者役のエージェントが内容を審査し、すべての主張から出典を確認できるインタラクティブなレポートとあわせて、AgentFieldで全工程を記録します。
+発売資料を翻訳するだけでは、現地の買い手が求める根拠、語調、形式に応えられません。LaunchLocallyは製品URLを1つ受け取り、日本市場に参入する海外企業向けに、現地の言語でナレーション付きのローンチ動画を作成します。動画のすべての文は、Tavilyを使う12のリサーチエージェントが集めた約40件の事実を出典として示し、現地の買い手役エージェント(日本では大企業の情報システム部門長による稟議形式の審査)が台本を差し戻すと修正版が作られます。AgentField、CodeAF、Daytona、Nosanaの2つのGPUデプロイメントを使って90〜160秒で完成し、スポンサー4社のサイトとLaunchLocally自身のローンチ動画を含む7件の実行記録を公開しています。
