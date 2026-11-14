@@ -253,12 +253,29 @@ Hard rules:
 - Read styles.css (its top comment lists the class names you may restyle) and index.html, then write theme.css.
 - Create or edit theme.css only. Do not change any other file.
 - CSS only: selectors that already exist in styles.css or index.html. Colors, backgrounds, borders, radii,
-  shadows, spacing, type sizes and weights. Do not hide elements, do not set display:none, do not change
+  shadows, spacing, type sizes and weights. Never hide headlines, claims, source chips, captions or logos; do not change
   positions in a way that makes text overlap or leave the 1280x720 frame.
 - No @import, no url() pointing at the network, no new fonts. Use the CSS variables already defined in :root.
 - Keep text readable: strong contrast between text and its background on every scene.
 - Never run git, npm, npx or a browser. Aim to finish within 4 tool calls and end with a two-line summary.
 """
+
+
+_DECORATIVE = ("claim-index", "scene-number", "rule", "browser-bar", "browser-url", "brand-name")  # safe to hide
+
+
+def _theme_problem(css: str) -> str:
+    """'' when the theme is safe to apply: no network use, and nothing hidden except decoration."""
+    bare = re.sub(r"/\*.*?\*/", "", css, flags=re.S).lower()  # comments may quote the rules
+    if any(bad in bare for bad in ("@import", "http://", "https://")):
+        return "theme.css uses the network"
+    for selectors, body in re.findall(r"([^{}]+)\{([^{}]*)\}", bare):
+        if re.search(r"(display\s*:\s*none|visibility\s*:\s*hidden)", body):
+            for sel in selectors.split(","):
+                last = re.findall(r"[.#]([\w-]+)", sel.strip())[-1:] or [""]
+                if last[0] not in _DECORATIVE:
+                    return f"theme.css hides content ({sel.strip()[:60]})"
+    return ""
 
 
 def build_theme(run_dir: Path, pack: dict) -> dict:
@@ -291,9 +308,8 @@ def build_theme(run_dir: Path, pack: dict) -> dict:
             problem = f"CodeAF did not finish ({res.get('stop')}): {res.get('error') or res.get('incomplete') or ''}"
         elif len(css.strip()) < 200 or "{" not in css:
             problem = "CodeAF wrote no usable theme.css"
-        elif any(bad in re.sub(r"/\*.*?\*/", "", css, flags=re.S).lower()  # comments may mention the rules
-                 for bad in ("@import", "http://", "https://", "display:none", "display: none")):
-            problem = "theme.css uses the network or hides elements"
+        elif _theme_problem(css):
+            problem = _theme_problem(css)
     except Exception as e:
         problem = f"CodeAF failed: {e}"
     seconds = round(time.time() - t0, 1)
