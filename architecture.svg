@@ -170,8 +170,8 @@
 <text x="1580" y="750" class="mono">llm.py, script.py, research.py</text>
 
 <rect x="20" y="768" width="170" height="28" rx="14" fill="#34d399"/><text x="105" y="788" class="pill">Nosana GPU</text>
-<text x="208" y="788">GPU deployment that runs the Kokoro voice model for narration.</text>
-<text x="1580" y="788" class="mono">launchlocal/voice.py</text>
+<text x="208" y="788">Two GPU deployments: Kokoro voice model for narration; vLLM with Qwen2.5-14B as the second text provider.</text>
+<text x="1580" y="788" class="mono">voice.py, llm.py</text>
 
 <rect x="20" y="806" width="170" height="28" rx="14" fill="#f472b6"/><text x="105" y="826" class="pill">CodeAF</text>
 <text x="208" y="826">Coding harness, headless on an Ollama Cloud model. Writes the theme that styles the video like the official site.</text>
