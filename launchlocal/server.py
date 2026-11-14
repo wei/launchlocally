@@ -95,8 +95,8 @@ def packs():
 def runs():
     out = []
     for d in RUNS.iterdir():
-        if not d.is_dir() or not RUN_ID.match(d.name):
-            continue
+        if not d.is_dir() or not RUN_ID.match(d.name) or d.name.startswith(("dev-", "fixture")):
+            continue  # development and fixture runs stay off the launcher
         inp = maybe_json(d / "input.json")
         if inp is None and not (d / "events.jsonl").exists():
             continue
