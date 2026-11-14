@@ -1,12 +1,54 @@
+<div align="center">
+
+<img src="site/logo.svg" width="96" alt="LaunchLocally logo">
+
 # LaunchLocally
 
-Paste a URL. Launch like a local. LaunchLocally takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source.
+**Paste a URL. Launch like a local.**
 
-![LaunchLocally architecture. A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research with Tavily and Nosana hosted Qwen, script with Nosana hosted Qwen, voice on a Nosana GPU deployment, a locally built baseline composition, restyling with CodeAF, rendering in a Daytona sandbox, and a buyer gate on Nosana hosted Qwen. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.](site/architecture.svg)
+LaunchLocally takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source.
 
-- Demo (recorded runs replayed in the browser, labelled as cached): https://wei.github.io/launchlocally/
-- Slides: https://wei.github.io/launchlocally/slides/
-- Submission answers: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
+[![Agent Forge AI Hackathon Tokyo 2026](https://img.shields.io/badge/Agent_Forge_AI_Hackathon-Tokyo_2026-black.svg)](https://wei.github.io/launchlocally/)
+<br>
+[![Built with AgentField](https://img.shields.io/badge/built_with-AgentField-555.svg)](https://github.com/Agent-Field)
+[![Built with CodeAF](https://img.shields.io/badge/built_with-CodeAF-555.svg)](https://github.com/Agent-Field)
+[![Built with Tavily](https://img.shields.io/badge/built_with-Tavily-555.svg)](https://github.com/tavily-ai)
+[![Built with Daytona](https://img.shields.io/badge/built_with-Daytona-555.svg)](https://github.com/daytonaio)
+[![Built with Nosana](https://img.shields.io/badge/built_with-Nosana-555.svg)](https://github.com/nosana-ci)
+
+**[Live site](https://wei.github.io/launchlocally/)** · **[Recorded runs](https://wei.github.io/launchlocally/demo/)** · **[Slides](https://wei.github.io/launchlocally/slides/)** · **[Demo run-book](docs/DEMO.md)** · **[Submission answers](docs/SUBMISSION.md)**
+
+<a href="https://wei.github.io/launchlocally/"><img src="site/launch-poster.png" width="720" alt="Poster frame of the LaunchLocally launch video. Click to open the site and play it."></a>
+
+<sub>LaunchLocally made this launch video by running on its own website. Click the image to watch it on the site.</sub>
+
+<table><tr>
+<td align="center"><img src="https://github.com/Agent-Field.png" width="28" alt="AgentField logo"><br>AgentField</td>
+<td align="center"><img src="https://github.com/Agent-Field.png" width="28" alt="CodeAF logo"><br>CodeAF</td>
+<td align="center"><img src="https://github.com/tavily-ai.png" width="28" alt="Tavily logo"><br>Tavily</td>
+<td align="center"><img src="https://github.com/daytonaio.png" width="28" alt="Daytona logo"><br>Daytona</td>
+<td align="center"><img src="https://github.com/nosana-ci.png" width="28" alt="Nosana logo"><br>Nosana</td>
+</tr></table>
+
+</div>
+
+## Contents
+
+- [How it works](#how-it-works)
+- [Innovation](#innovation)
+- [Real-World Impact](#real-world-impact)
+- [Technical Execution](#technical-execution)
+- [Partner Tech Usage](#partner-tech-usage)
+- [Open source we build on](#open-source-we-build-on)
+- [Market packs](#market-packs)
+- [Run it](#run-it)
+- [What is live and what is a fallback](#what-is-live-and-what-is-a-fallback)
+- [Limits](#limits)
+- [Recorded runs](#recorded-runs)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## How it works
 
@@ -20,27 +62,29 @@ Paste a URL. Launch like a local. LaunchLocally takes a product URL and a target
 8. **Buyer gate.** A local buyer persona from the market pack scores the script of each cut while it is voiced and rendered. Three verdicts: `approve`; `reject`, when an unused sourced fact would fix the concern, in which case the script is revised and cut 2 is voiced and rendered; and `approve_with_gaps`, when the video already uses the evidence that exists and the rest is for the vendor to provide. The gaps are listed in the brief.
 9. **Output.** The launch video and an interactive brief. Clicking a claim opens its source.
 
+![LaunchLocally architecture. A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research with Tavily and Nosana hosted Qwen, script with Nosana hosted Qwen, voice on a Nosana GPU deployment, a locally built baseline composition, restyling with CodeAF, rendering in a Daytona sandbox, and a buyer gate on Nosana hosted Qwen. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.](site/architecture.svg)
+
 AgentField runs steps 2 to 8. Each stage is its own node in the workflow graph.
 
 ```mermaid
 flowchart LR
-  URL[Product URL] --> R
-  PACK[Market pack JSON] -.-> R
+  URL["Product URL"] --> R
+  PACK["Market pack JSON"] -.-> R
   PACK -.-> S
   PACK -.-> V
   PACK -.-> G
-  subgraph AF[AgentField control plane: one node per stage]
-    R[Research: 12 agents<br/>Tavily + Nosana Qwen] --> S[Script<br/>Nosana Qwen]
-    S --> V[Voice<br/>Nosana GPU, Kokoro]
-    V --> C[Compose<br/>local code, Hyperframes]
-    R -. brand profile .-> K[Code: brand theme<br/>CodeAF on Ollama Cloud]
-    K -. theme.css .-> C
-    C --> D[Render<br/>Daytona sandbox]
-    S --> G{Buyer gate<br/>Nosana Qwen}
-    G -- reject: cut 2 --> S
+  subgraph AF["AgentField control plane, one node per stage"]
+    R["Research, 12 agents<br/>Tavily and Nosana Qwen"] --> S["Script<br/>Nosana Qwen"]
+    S --> V["Voice<br/>Nosana GPU, Kokoro"]
+    V --> C["Compose<br/>local code, Hyperframes"]
+    R -. "brand profile" .-> K["Code, brand theme<br/>CodeAF on Ollama Cloud"]
+    K -. "theme stylesheet" .-> C
+    C --> D["Render<br/>Daytona sandbox"]
+    S --> G{"Buyer gate<br/>Nosana Qwen"}
+    G -->|"reject, cut 2"| S
   end
-  D --> OUT[Launch video + interactive brief]
-  G -- approve, or approve with gaps --> OUT
+  D --> OUT["Launch video and interactive brief"]
+  G -->|"approve, or approve with gaps"| OUT
 ```
 
 ## Innovation
@@ -63,14 +107,14 @@ flowchart LR
 
 ## Partner Tech Usage
 
-| Partner | Job | Why the product breaks without it | Where in the code |
-|---------|-----|-----------------------------------|-------------------|
-| AgentField | Control plane. Runs each pipeline stage as its own node and shows the workflow graph. | No record of which agent did what, and no graph of the two passes. | [`launchlocal/agents.py`](launchlocal/agents.py): `build_app` registers one reasoner per stage; `launch_flow` calls each with `app.call`; `launch` posts to the control plane's execute endpoint. |
-| CodeAF | Coding harness. Runs headless on an Ollama Cloud model and writes the theme stylesheet that makes the video look like the official site. | The video keeps the baseline look and does not match the official site. | [`launchlocal/coder.py`](launchlocal/coder.py): `_run_codeaf` runs `codeaf exec`; `build_theme` writes `theme.css` in a scratch copy and checks it; `theme_passes_lint` lints the real composition with the theme applied. [`launchlocal/compose.py`](launchlocal/compose.py) appends the theme. |
-| Tavily | Map, extract and search for 12 parallel research agents: 5 on the official site, 7 on the target market. | No sourced facts, so the script has nothing it is allowed to say. | [`launchlocal/research.py`](launchlocal/research.py): `run_research` and its inner `call`, which invokes `map`, `extract` and `search` on `AsyncTavilyClient`. |
-| Nosana (hosted inference) | Qwen extracts facts, writes the script and the design brief, and plays the buyer gate. | No facts, no script and no review. | [`launchlocal/llm.py`](launchlocal/llm.py): `chat`, `chat_json`. [`launchlocal/script.py`](launchlocal/script.py): `write_script`, `_design_brief`, `buyer_gate`, `revise_script`. [`launchlocal/research.py`](launchlocal/research.py): `_Model.ask`. |
-| Nosana (GPU deployments) | Two deployments created through Nosana's REST API. One runs the Kokoro voice model that narrates each scene. The other runs a vLLM server with Qwen2.5-14B, the second text provider when the hosted catalog has no chat model. | The video has no narration, and text generation depends on a catalog that changed during the build day. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployments: [`docs/nosana-voice.md`](docs/nosana-voice.md), [`docs/nosana-llm.md`](docs/nosana-llm.md); `providers` in [`launchlocal/llm.py`](launchlocal/llm.py) reads `docs/nosana-llm.json`. |
-| Daytona | Sandbox that renders the Hyperframes HTML composition to MP4 with headless Chrome and FFmpeg, and serves the result. | Nowhere isolated to run agent-written code, and no hosted video. | [`launchlocal/render.py`](launchlocal/render.py): `_sandbox` creates or reuses the sandbox; `_remote` runs the render commands; `render` uploads, renders and downloads. Setup: [`docs/daytona-render.md`](docs/daytona-render.md). |
+| | Partner | Job | Why the product breaks without it | Where in the code |
+|---|---------|-----|-----------------------------------|-------------------|
+| <img src="https://github.com/Agent-Field.png" width="28" alt="AgentField logo"> | AgentField | Control plane. Runs each pipeline stage as its own node and shows the workflow graph. | No record of which agent did what, and no graph of the two passes. | [`launchlocal/agents.py`](launchlocal/agents.py): `build_app` registers one reasoner per stage; `launch_flow` calls each with `app.call`; `launch` posts to the control plane's execute endpoint. |
+| <img src="https://github.com/Agent-Field.png" width="28" alt="CodeAF logo"> | CodeAF | Coding harness. Runs headless on an Ollama Cloud model and writes the theme stylesheet that makes the video look like the official site. | The video keeps the baseline look and does not match the official site. | [`launchlocal/coder.py`](launchlocal/coder.py): `_run_codeaf` runs `codeaf exec`; `build_theme` writes `theme.css` in a scratch copy and checks it; `theme_passes_lint` lints the real composition with the theme applied. [`launchlocal/compose.py`](launchlocal/compose.py) appends the theme. |
+| <img src="https://github.com/tavily-ai.png" width="28" alt="Tavily logo"> | Tavily | Map, extract and search for 12 parallel research agents: 5 on the official site, 7 on the target market. | No sourced facts, so the script has nothing it is allowed to say. | [`launchlocal/research.py`](launchlocal/research.py): `run_research` and its inner `call`, which invokes `map`, `extract` and `search` on `AsyncTavilyClient`. |
+| <img src="https://github.com/nosana-ci.png" width="28" alt="Nosana logo"> | Nosana (hosted inference) | Qwen extracts facts, writes the script and the design brief, and plays the buyer gate. | No facts, no script and no review. | [`launchlocal/llm.py`](launchlocal/llm.py): `chat`, `chat_json`. [`launchlocal/script.py`](launchlocal/script.py): `write_script`, `_design_brief`, `buyer_gate`, `revise_script`. [`launchlocal/research.py`](launchlocal/research.py): `_Model.ask`. |
+| <img src="https://github.com/nosana-ci.png" width="28" alt="Nosana logo"> | Nosana (GPU deployments) | Two deployments created through Nosana's REST API. One runs the Kokoro voice model that narrates each scene. The other runs a vLLM server with Qwen2.5-14B, the second text provider when the hosted catalog has no chat model. | The video has no narration, and text generation depends on a catalog that changed during the build day. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployments: [`docs/nosana-voice.md`](docs/nosana-voice.md), [`docs/nosana-llm.md`](docs/nosana-llm.md); `providers` in [`launchlocal/llm.py`](launchlocal/llm.py) reads `docs/nosana-llm.json`. |
+| <img src="https://github.com/daytonaio.png" width="28" alt="Daytona logo"> | Daytona | Sandbox that renders the Hyperframes HTML composition to MP4 with headless Chrome and FFmpeg, and serves the result. | Nowhere isolated to run agent-written code, and no hosted video. | [`launchlocal/render.py`](launchlocal/render.py): `_sandbox` creates or reuses the sandbox; `_remote` runs the render commands; `render` uploads, renders and downloads. Setup: [`docs/daytona-render.md`](docs/daytona-render.md). |
 
 ## Open source we build on
 
@@ -89,7 +133,7 @@ flowchart LR
 | App | OpenAI Python SDK | Client for the OpenAI-compatible model endpoints (Nosana, Ollama Cloud) |
 | App | tavily-python, Daytona Python SDK, AgentField Python SDK | Partner SDKs |
 | App | uv, qrcode.js | Python environment; QR code on the brief |
-| Inspiration | /brag agent skill (latent-spaces/brag), LaunchCut | Project-to-launch-video as an agent task; LaunchLocally adds live market research, localization, a buyer review and sourced claims |
+| Inspiration | /brag agent skill (latent-spaces/brag) | Project-to-launch-video as an agent task; LaunchLocally adds live market research, localization, a buyer review and sourced claims |
 
 Models: Kokoro for voice. Text generation tries Nosana hosted inference (Qwen 3.8 27B, when the catalog lists it), then Qwen2.5-14B on the project's own Nosana GPU deployment, then DeepSeek V4.1 Flash on Ollama Cloud. CodeAF runs Kimi K2.7 Code on Ollama Cloud.
 
@@ -165,3 +209,15 @@ Live path: Tavily, Nosana hosted inference, the Nosana GPU voice deployment, Cod
 - The Nosana voice deployment has a job timeout and must be recreated after it ends. The Daytona sandbox is kept warm and stays billable until stopped.
 - The Daytona preview URL shows a Daytona warning page in phone browsers. The MP4 is also downloaded to the run directory and served by the web app.
 - The AgentField control plane runs locally in this build.
+
+## Recorded runs
+
+Recorded runs replay in the browser at https://wei.github.io/launchlocally/demo/ and are labelled as cached. The runs cover Daytona, Tavily, Nosana, AgentField, AI Builders, and LaunchLocally on its own site.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
+
+## Acknowledgements
+
+Built at the Agent Forge AI Hackathon Tokyo on 14 November 2026, organized by AI Builders with Plug and Play Japan. Thanks to the AgentField, CodeAF, Tavily, Daytona and Nosana teams.
