@@ -124,19 +124,23 @@
     "questions": [
       {
         "id": "tone",
-        "q": "Is the tone appropriate for a Japanese enterprise buyer?"
+        "q": "Is the tone appropriate for a Japanese enterprise buyer?",
+        "needs_evidence": false
       },
       {
         "id": "trust",
-        "q": "Are security, data location or support concerns addressed with evidence?"
+        "q": "Are security, data location or support concerns addressed with evidence?",
+        "needs_evidence": true
       },
       {
         "id": "local_proof",
-        "q": "Is there local proof such as Japanese customers, partners, pricing in yen or local sources?"
+        "q": "Is there local proof such as Japanese customers, partners, pricing in yen or local sources?",
+        "needs_evidence": true
       },
       {
         "id": "clarity",
-        "q": "Is it clear what the product does and what to do next?"
+        "q": "Is it clear what the product does and what to do next?",
+        "needs_evidence": false
       }
     ]
   }

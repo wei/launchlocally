@@ -121,19 +121,23 @@
     "questions": [
       {
         "id": "tone",
-        "q": "Does it read like native, confident US B2B copy with no hype or translation artifacts?"
+        "q": "Does it read like native, confident US B2B copy with no hype or translation artifacts?",
+        "needs_evidence": false
       },
       {
         "id": "trust",
-        "q": "Are security, compliance or reliability concerns addressed with evidence?"
+        "q": "Are security, compliance or reliability concerns addressed with evidence?",
+        "needs_evidence": true
       },
       {
         "id": "local_proof",
-        "q": "Is there proof that matters to a US buyer, such as named customers, adoption, benchmarks or USD pricing?"
+        "q": "Is there proof that matters to a US buyer, such as named customers, adoption, benchmarks or USD pricing?",
+        "needs_evidence": true
       },
       {
         "id": "clarity",
-        "q": "Is it clear in seconds what the product does for my team and what to do next?"
+        "q": "Is it clear in seconds what the product does for my team and what to do next?",
+        "needs_evidence": false
       }
     ]
   }

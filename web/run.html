@@ -386,9 +386,10 @@ function roundHtml(r, i) {
     return `<span title="${esc(q ? q.q : k)}">${esc(k.replace(/_/g, ' '))}</span><span class="bar"><i style="width:${Math.round(v * 100)}%;background:${col}"></i></span><span class="v">${(+v).toFixed(2)}</span>`;
   }).join('');
   const ok = /approve|pass/i.test(r.verdict || '');
-  return `<div class="round"><div class="stamp ${ok ? 'approve' : 'reject'}"><small>CUT ${esc(r.cut || i + 1)}</small>${ok ? 'APPROVE' : 'REJECT'}</div>
+  const gaps = /gaps/i.test(r.verdict || '');
+  return `<div class="round"><div class="stamp ${ok ? 'approve' : 'reject'}"><small>CUT ${esc(r.cut || i + 1)}</small>${ok ? 'APPROVE' : 'REJECT'}${gaps ? '<small>GAPS NOTED</small>' : ''}</div>
     <div class="bars">${bars}</div>
-    <ul class="reasons">${(r.reasons || []).map(x => `<li>${esc(typeof x === 'string' ? x : T(x, ''))}</li>`).join('')}</ul></div>`;
+    <ul class="reasons">${(r.reasons || []).concat(r.gaps || []).map(x => `<li>${esc(typeof x === 'string' ? x : T(x, ''))}</li>`).join('')}</ul></div>`;
 }
 function personaHtml() {
   const p = (S.gate && S.gate.persona) || (S.pack && S.pack.buyer_persona) || {};

@@ -252,17 +252,29 @@ async def buyer_gate(run_dir: Path, pack: dict, cut: int) -> dict:
         f"Facts the script cites or could cite (unused ones are candidates for fixes):\nUSED: {sorted(used)}\n{_facts_block(facts)}\n\n"
         'Return {"scores": {' + ", ".join(f'"{q}": float' for q in qids) + '}, '
         f'"reasons": [{{"local": str ({pack["language_name"]}), "en": str}}] (1 to 3, your main concerns or praise), '
-        '"fixes": [{"scene": "s1".."s4", "instruction_en": str, "fact_ids": [ids of UNUSED facts that address it]}] (empty if nothing to fix)}',
+        '"fixes": [{"scene": "s1".."s4", "instruction_en": str, "fact_ids": [ids of UNUSED facts that address it]}] (empty if nothing to fix), '
+        f'"gaps": [{{"local": str ({pack["language_name"]}), "en": str}}] (0 to 4: things you would need from the vendor that NO listed fact covers, '
+        "for example local support, certifications, data location, local customers, local-currency pricing)}",
         1500,
     )
     scores = {q: max(0.0, min(1.0, float((res.get("scores") or {}).get(q, 0)))) for q in qids}
-    verdict = "approve" if all(v >= PASS for v in scores.values()) else "reject"
     unused_ids = {f["id"] for f in unused}
-    fixes = [] if verdict == "approve" else [
+    fixes = [
         {"scene": f.get("scene"), "instruction_en": f.get("instruction_en", ""), "fact_ids": [i for i in f.get("fact_ids", []) if i in unused_ids]}
         for f in res.get("fixes") or [] if f.get("scene") in {s["id"] for s in script["scenes"]}]
+    fixable = [f for f in fixes if f["fact_ids"]]  # a fix counts only if an unused sourced fact backs it
+    failing = [q["id"] for q in p["questions"] if scores[q["id"]] < PASS]
+    evidence_only = all(q.get("needs_evidence") for q in p["questions"] if q["id"] in failing)
+    if not failing:
+        verdict, fixes = "approve", []
+    elif (fixable and cut < 2) or not evidence_only:
+        verdict, fixes = "reject", fixable or fixes
+    else:
+        # The video already uses the evidence that exists; what is missing is the vendor's to provide, not the video's to fix.
+        verdict, fixes = "approve_with_gaps", []
+    gaps = [{"local": g.get("local", ""), "en": g.get("en", "")} for g in res.get("gaps") or [] if isinstance(g, dict)][:4]
     rnd = {"cut": cut, "verdict": verdict, "scores": scores,
-           "reasons": [{"local": r.get("local", ""), "en": r.get("en", "")} for r in res.get("reasons") or []], "fixes": fixes}
+           "reasons": [{"local": r.get("local", ""), "en": r.get("en", "")} for r in res.get("reasons") or []], "fixes": fixes, "gaps": gaps}
     emit(rd, "gate", "progress", " ".join(f"{k} {v:.2f}" for k, v in scores.items()), scores=scores)
     gpath = rd / "gate.json"
     gate = read_json(gpath) if gpath.exists() else {}
