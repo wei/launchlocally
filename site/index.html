@@ -1,22 +1,271 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LaunchLocal</title>
-<style>
-body{margin:0;background:#0b0d10;color:#f2f4f7;font:18px/1.5 system-ui,-apple-system,"Noto Sans JP",sans-serif}
-main{max-width:960px;margin:0 auto;padding:56px 20px}
-h1{font-size:48px;margin:0}h1 i{font-style:normal;color:#2ecc71}p{color:#aab2bd;max-width:60ch}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:28px 0}
-.card{display:flex;flex-direction:column;gap:4px;padding:20px;border:1px solid #2a2f37;border-radius:12px;background:#14171c;color:inherit;text-decoration:none}
-.card:hover{border-color:#2ecc71}.card b{font-size:24px}.card span{color:#aab2bd;font-size:15px}
-.links a{color:#2ecc71;margin-right:20px}img{width:100%;border-radius:12px;margin-top:28px}
-.note{font-size:15px}
-</style></head><body><main>
-<h1>Launch<i>Local</i></h1>
-<p>Paste a URL. Launch like a local. Agents research a product and a target market, then write, voice and render a launch video in the local language and style, with an interactive brief where every claim opens its source.</p>
-<p class="note">These are recorded runs replayed in your browser, so each page shows a CACHED RUN badge. The live app runs the same pipeline on demand.</p>
-<div class="cards">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LaunchLocal: Paste a URL. Launch like a local.</title>
+<meta name="description" content="LaunchLocal turns a product URL into a launch video for Japan. Agents research your product and the local market, then write, voice and render a video in Japanese, plus an interactive brief where every claim opens its source.">
+<meta name="theme-color" content="#c5361d">
+<meta property="og:title" content="LaunchLocal: Paste a URL. Launch like a local.">
+<meta property="og:description" content="Paste your product URL and pick a market. Agents research, write, voice and render a launch video in the local language, with a brief where every claim opens its source.">
+<meta property="og:image" content="img/waiting-screen.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-</div>
-<p class="links"><a href="slides/">Slides</a><a href="https://github.com/wei/launchlocal">GitHub repository</a></p>
-<img src="architecture.svg" alt="LaunchLocal architecture: AgentField runs research on Tavily, script and buyer gate on Nosana, voice on a Nosana GPU, CodeAF restyle, and render in a Daytona sandbox">
-</main></body></html>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="logo.svg" alt="LaunchLocal logo" width="268" height="48"></a>
+    <nav aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="demo/">Recorded runs</a>
+      <a href="docs/">Docs</a>
+      <a href="pricing/">Pricing</a>
+      <a href="slides/">Slides</a>
+      <a href="https://github.com/wei/launchlocal">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="kicker">LaunchLocal. Paste a URL. Launch like a local.</p>
+      <h1>Launch in Japan <em>like a local</em> company.</h1>
+      <p class="lede">Paste your product URL and pick a market. Agents research your product and the local market, then write, voice and render a launch video in the local language and style, plus an interactive brief where every claim opens its source.</p>
+      <div class="actions">
+        <a class="btn" href="demo/">See recorded runs</a>
+        <a href="https://github.com/wei/launchlocal">Source code on GitHub</a>
+      </div>
+      <ul class="facts">
+        <li><b>12</b> research agents per run</li>
+        <li><b>About 40</b> sourced facts per run</li>
+        <li><b>80 to 100</b> seconds from URL to the first cut</li>
+      </ul>
+    </div>
+    <div>
+      <div class="media">
+        <img src="img/waiting-screen.png" alt="Screenshot of the LaunchLocal app from a recorded run for daytona.io" width="1280" height="720">
+        <video controls preload="metadata" poster="launch-poster.png" src="launch.mp4" onerror="this.hidden=true" aria-label="LaunchLocal launch video, made by LaunchLocal from this website"></video>
+      </div>
+      <p class="caption">LaunchLocal's own launch video, made by running LaunchLocal on this website. Until that run is published, this frame shows a screenshot of the app from a recorded run.</p>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">THE PROBLEM</p>
+      <h2>Translation is not localization.</h2>
+      <p>A company entering Japan usually translates its launch material. Local buyers expect more than a translation. They expect local proof, local tone and a local format. Getting those today means hiring a local agency and waiting.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card top"><h3>Local proof</h3><p>Buyers look for evidence from their own market: local customers, local pricing, local support and the compliance documents their company asks for.</p></div>
+      <div class="card top"><h3>Local tone</h3><p>Business Japanese written from scratch reads differently from a translated English slogan. The script is written in the local language, not translated into it.</p></div>
+      <div class="card top"><h3>Local format</h3><p>Each market has its own conventions for how a B2B product is presented. The market pack carries the copy rules and style rules for the video.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">HOW IT WORKS</p>
+      <h2>Six steps from a URL to a launch video.</h2>
+      <p>The input is one URL. No brand guide, script or footage is needed. Brand colors, logo and images are read from your official site.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>URL and market</h3><p>You paste a product URL and pick a market. Japan is the default.</p></li>
+      <li><h3>Research</h3><p>12 agents run in parallel. 5 read the official site: brand, product, pricing, customers and docs. 7 search the local web using the areas in the market pack. Each fact keeps its source URL.</p></li>
+      <li><h3>Script</h3><p>A four-scene script is written in the local language: hook, product, proof and call to action. A sentence stays only if it cites a fact from the research.</p></li>
+      <li><h3>Voice</h3><p>A Kokoro text-to-speech model on a GPU narrates each scene in the local language.</p></li>
+      <li><h3>Brand theme and render</h3><p>A coding agent writes a stylesheet that makes the video look like your official site. A sandbox renders the composition to MP4.</p></li>
+      <li><h3>Local buyer gate</h3><p>An agent playing a local buyer approves or rejects the cut. If it rejects, the script is revised and a second cut is made.</p></li>
+    </ol>
+    <p class="caption">Measured on the build day: about 80 to 100 seconds from URL to the first cut, and about 115 to 140 seconds when the buyer agent rejects cut 1 and a second cut is made.</p>
+  </div>
+</section>
+
+<section id="output">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">WHAT YOU GET</p>
+      <h2>A video, a brief you can check, and a list of gaps.</h2>
+    </div>
+    <div class="grid g3">
+      <div class="shot">
+        <img src="img/daytona-scene-3.png" alt="Frame from a generated Japanese launch video for daytona.io" width="1280" height="720">
+        <h3>The launch video</h3>
+        <p>Four scenes, about 25 seconds, with narration in the local language. Styled from your own site's colors and logo.</p>
+      </div>
+      <div class="shot">
+        <img src="img/interactive-brief.png" alt="The interactive brief in the LaunchLocal app, listing claims with their sources" width="1280" height="720">
+        <h3>The interactive brief</h3>
+        <p>Every claim in the video is listed. Clicking a claim opens its source, so a reviewer can check it before the video is used.</p>
+      </div>
+      <div class="shot">
+        <img src="img/waiting-screen.png" alt="Screenshot of the LaunchLocal app from a recorded run" width="1280" height="720">
+        <h3>What a local buyer will still ask for</h3>
+        <p>The buyer agent lists the evidence it could not find, such as local proof that only you can provide. These gaps are in the brief.</p>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:20px">
+      <figure><img src="img/daytona-scene-9.png" alt="Second frame from the generated launch video for daytona.io" width="1280" height="720"><figcaption>Frame from the recorded run for daytona.io.</figcaption></figure>
+      <figure><img src="img/daytona-scene-16.png" alt="Third frame from the generated launch video for daytona.io" width="1280" height="720"><figcaption>Another frame from the same video.</figcaption></figure>
+      <figure><img src="img/tavily-scene.png" alt="Frame from the generated launch video for tavily.com" width="1280" height="720"><figcaption>Frame from the recorded run for tavily.com.</figcaption></figure>
+    </div>
+    <p class="caption">Recorded runs exist for daytona.io, tavily.com, nosana.com and agentfield.ai. <a href="demo/">See the recorded runs</a>.</p>
+  </div>
+</section>
+
+<section id="buyer-gate" class="band">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">LOCAL BUYER GATE</p>
+      <h2>The cut is reviewed by a local buyer, not by its author.</h2>
+      <p>An agent plays a local buyer from the market pack. For Japan it is the head of IT at a large enterprise, reviewing the video as a ringi approval: the internal sign-off a Japanese company uses before it buys. The buyer scores the questions listed in the market pack and then approves or rejects the cut.</p>
+      <p>The gate allows one revision. Cut 2 is final whether or not it is approved.</p>
+    </div>
+    <ul class="verdicts">
+      <li><code>approve</code><p>The cut answers the buyer's questions. It is the final video.</p></li>
+      <li><code>reject</code><p>A sourced fact that the script did not use would fix the concern. The script is revised with the buyer's reasons, and cut 2 is voiced and rendered.</p></li>
+      <li><code>approve_with_gaps</code><p>The video already uses the evidence that exists. What is missing is for the vendor to provide, and it is listed in the brief.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section id="partners">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">ARCHITECTURE</p>
+      <h2>Built with partner technology</h2>
+      <p>Each stage runs as its own node. Each partner does one job that the product needs.</p>
+    </div>
+    <div class="arch"><img src="architecture.svg" alt="LaunchLocal architecture. A product URL and a market pack enter the AgentField control plane, which runs research, script, voice, compose, brand theme, render and the buyer gate as separate nodes. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief." width="1600" height="900"></div>
+    <dl class="rows">
+      <dt>AgentField</dt><dd>Control plane. Runs each pipeline stage as its own node and shows the workflow graph.</dd>
+      <dt>CodeAF</dt><dd>Coding harness that writes the video's brand theme, a stylesheet that makes the video look like the official site.</dd>
+      <dt>Tavily</dt><dd>Map, extract and search for the 12 research agents.</dd>
+      <dt>Daytona</dt><dd>Sandbox that renders the video composition to MP4.</dd>
+      <dt>Nosana</dt><dd>GPU deployment for the voice model, and hosted inference for text when its catalog lists a chat model.</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="open-source">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">CREDITS</p>
+      <h2>Open source we build on</h2>
+      <p>LaunchLocal was built in one afternoon. That was possible because of these projects.</p>
+    </div>
+    <div class="oss">
+      <div class="card"><h3>Agents</h3><ul>
+        <li><a href="https://github.com/Agent-Field/agentfield">AgentField</a>: agent control plane.</li>
+        <li><b>CodeAF</b>: coding harness.</li>
+      </ul></div>
+      <div class="card"><h3>Video</h3><ul>
+        <li><a href="https://github.com/heygen-com/hyperframes">Hyperframes</a>: HTML compositions rendered to MP4.</li>
+        <li><a href="https://gsap.com/">GSAP</a>: animation timeline.</li>
+        <li><a href="https://ffmpeg.org/">FFmpeg</a>: encodes the video and audio.</li>
+        <li><b>Chrome Headless Shell</b>: draws each frame.</li>
+      </ul></div>
+      <div class="card"><h3>Voice</h3><ul>
+        <li><a href="https://github.com/hexgrad/kokoro">Kokoro</a>: text-to-speech model.</li>
+        <li><a href="https://github.com/remsky/Kokoro-FastAPI">Kokoro-FastAPI</a>: the server image on the Nosana GPU.</li>
+        <li><a href="https://github.com/thewh1teagle/kokoro-onnx">kokoro-onnx</a> and <a href="https://github.com/hexgrad/misaki">misaki</a>: local fallback.</li>
+      </ul></div>
+      <div class="card"><h3>Type</h3><ul>
+        <li><a href="https://fonts.google.com/noto/specimen/Noto+Sans+JP">Noto Sans JP</a>: the typeface in the Japanese video.</li>
+      </ul></div>
+      <div class="card"><h3>App</h3><ul>
+        <li><a href="https://github.com/fastapi/fastapi">FastAPI</a> and <a href="https://www.uvicorn.org/">Uvicorn</a>: the web app and its server.</li>
+        <li><a href="https://github.com/encode/httpx">httpx</a>: HTTP client.</li>
+        <li><a href="https://github.com/openai/openai-python">OpenAI Python SDK</a>: used against OpenAI-compatible endpoints.</li>
+        <li><a href="https://github.com/tavily-ai/tavily-python">tavily-python</a>: Tavily client.</li>
+        <li><a href="https://github.com/daytonaio/daytona">Daytona Python SDK</a>: sandbox client.</li>
+        <li><a href="https://github.com/astral-sh/uv">uv</a>: Python packaging.</li>
+        <li><b>qrcode.js</b>: QR code for the result page.</li>
+      </ul></div>
+      <div class="card"><h3>Inspiration</h3><ul>
+        <li><a href="https://github.com/latent-spaces/brag">The /brag agent skill</a> (latent-spaces/brag).</li>
+        <li><b>LaunchCut</b>: a past Daytona hackathon project.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="honest">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">HONEST BY DESIGN</p>
+      <h2>The video says only what a source says.</h2>
+    </div>
+    <div class="grid g2">
+      <ul class="checks">
+        <li><b>Unsourced sentences are dropped.</b> Every sentence in the video cites a fact from the research. A sentence with no fact behind it is removed, not rewritten.</li>
+        <li><b>Numbers are copied from sources.</b> A number or price in the script must appear in the source it cites.</li>
+        <li><b>Cached runs are labelled.</b> A recorded run replayed in the browser shows a "CACHED RUN" badge.</li>
+        <li><b>Fallbacks are logged.</b> Each external service has a named fallback, and the run log records when one is used.</li>
+      </ul>
+      <div class="card">
+        <h3>Known limits</h3>
+        <p>The source check confirms that each sentence cites an existing fact and that its numbers appear in the source. It does not check that the source fully supports the wording. That is why the brief exists: a person can open each source and decide.</p>
+        <p>The video has four scenes. The buyer gate allows one revision.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="markets">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">MARKETS</p>
+      <h2>A market is one JSON file.</h2>
+      <p>A market pack sets the language, the voice, the local sites to search, the research areas, the copy and style rules, and the buyer persona. Two packs exist today.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><span class="tag">ja-JP</span><h3>International product to Japan</h3><p>The default. Research covers local competitors, local pricing, vocabulary, trust and compliance, existing local presence, marketing style and current news. The script is in business Japanese.</p></div>
+      <div class="card"><span class="tag">en-US</span><h3>Japanese product to global</h3><p>The reverse pack. It launches a Japanese product globally in English.</p></div>
+      <div class="card"><span class="tag">packs/&lt;id&gt;.json</span><h3>A new market</h3><p>Copy an existing pack and edit it. The app lists every file in the packs folder, so the new market appears in the picker without code changes. <a href="docs/#market-pack">How to add a pack</a>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">LINKS</p>
+      <h2>Slides and source code</h2>
+      <p>LaunchLocal was built in one afternoon at the Agent Forge AI Hackathon Tokyo on 14 November 2026. The code is public.</p>
+    </div>
+    <div class="actions">
+      <a class="btn" href="slides/">Open the slides</a>
+      <a href="https://github.com/wei/launchlocal">Repository: github.com/wei/launchlocal</a>
+      <a href="demo/">Recorded runs</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <nav aria-label="Footer">
+      <a href="demo/">Recorded runs</a>
+      <a href="docs/">Docs</a>
+      <a href="pricing/">Pricing</a>
+      <a href="slides/">Slides</a>
+      <a href="https://github.com/wei/launchlocal">GitHub</a>
+    </nav>
+    <span>LaunchLocal. Agent Forge AI Hackathon Tokyo, 14 November 2026.</span>
+  </div>
+</footer>
+
+</body>
+</html>
