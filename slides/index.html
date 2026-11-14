@@ -23,7 +23,7 @@ html,body{height:100%;background:#000;color:var(--text);
 .slide{position:absolute;inset:0;padding:2.5em 4em 3.2em;display:flex;flex-direction:column;
   visibility:hidden;line-height:1.45}
 .slide.on{visibility:visible}
-.slide::after{content:attr(data-n) " / 8";position:absolute;right:2em;bottom:1.1em;
+.slide::after{content:attr(data-n) " / 10";position:absolute;right:2em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-variant-numeric:tabular-nums}
 .slide::before{content:"LaunchLocal";position:absolute;left:4em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-weight:700;letter-spacing:.02em}
@@ -103,6 +103,26 @@ tr:last-child td{border-bottom:0}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:1.1em}
 .s5 .card h3{font-size:1.4em}
 .s5 .card h3 em{font-style:normal;color:var(--accent)}
+
+/* open source */
+.s6{padding-top:1.8em}
+.s6 h2{font-size:2em}
+.s6 h2 + .jp{font-size:1.15em;margin-top:.2em;padding-bottom:.4em}
+.s6 .cols3{gap:.8em}
+.s6 .card{padding:.7em 1em}
+.s6 .card h3{font-size:1.15em}
+.s6 .card h3 .jp{font-size:.8em;margin-left:.4em}
+.s6 ul{list-style:none;margin-top:.35em}
+.s6 li{font-size:.9em;line-height:1.4;padding:.22em 0;border-top:.06em solid var(--line)}
+
+/* dogfood video */
+.s9{padding-top:1.8em}
+.s9 h2{font-size:2em}
+.s9 h2 + .jp{font-size:1.15em;margin-top:.2em;padding-bottom:.4em}
+.s9 .body{align-items:center;padding-top:.6em}
+.s9 video{flex:1;min-height:0;max-width:100%;aspect-ratio:16/9;background:#000;border-radius:.5em;cursor:auto}
+.s9 .lead{font-size:1.2em;margin-top:.6em;text-align:center}
+.s9 .lead + .jp{font-size:.95em;margin:.2em 0 0;text-align:center}
 
 /* 6 market */
 .split{display:grid;grid-template-columns:5fr 6fr;gap:2em;align-items:stretch}
@@ -241,7 +261,28 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
-<section class="slide s5" data-n="6">
+<section class="slide s6" data-n="6">
+  <h2>Open source we build on</h2>
+  <p class="jp">利用しているオープンソース</p>
+  <div class="body">
+    <div class="cols3">
+      <div class="card"><h3><b>Agents</b> <span class="jp">エージェント</span></h3>
+        <ul><li>AgentField: agent control plane</li><li>CodeAF: coding harness</li></ul></div>
+      <div class="card"><h3><b>Video</b> <span class="jp">動画</span></h3>
+        <ul><li>Hyperframes: HTML compositions rendered to MP4</li><li>GSAP: animation timeline</li><li>FFmpeg, Chrome Headless Shell</li></ul></div>
+      <div class="card"><h3><b>Voice</b> <span class="jp">音声</span></h3>
+        <ul><li>Kokoro: text-to-speech model</li><li>Kokoro-FastAPI: server image on the Nosana GPU</li><li>kokoro-onnx, misaki: local fallback</li></ul></div>
+      <div class="card"><h3><b>Type</b> <span class="jp">書体</span></h3>
+        <ul><li>Noto Sans JP</li></ul></div>
+      <div class="card"><h3><b>App</b> <span class="jp">アプリ</span></h3>
+        <ul><li>FastAPI, Uvicorn, httpx</li><li>OpenAI Python SDK, for OpenAI-compatible endpoints</li><li>tavily-python, Daytona Python SDK</li><li>uv, qrcode.js</li></ul></div>
+      <div class="card"><h3><b>Inspiration</b> <span class="jp">着想</span></h3>
+        <ul><li>The /brag agent skill (latent-spaces/brag)</li><li>LaunchCut, a past Daytona hackathon project</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide s5" data-n="7">
   <h2>Honest by design</h2>
   <p class="jp">正確さを守る設計</p>
   <div class="body">
@@ -258,7 +299,7 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
-<section class="slide" data-n="7">
+<section class="slide" data-n="8">
   <h2>Any market</h2>
   <p class="jp">どの市場にも対応できます</p>
   <div class="body">
@@ -286,7 +327,17 @@ tr:last-child td{border-bottom:0}
   </div>
 </section>
 
-<section class="slide" data-n="8">
+<section class="slide s9" data-n="9">
+  <h2>We launched ourselves with it</h2>
+  <p class="jp">自分たちのローンチ動画もLaunchLocalで作りました</p>
+  <div class="body">
+    <video controls src="../launch.mp4" poster="../launch-poster.png"></video>
+    <p class="lead">The team pointed LaunchLocal at its own website to make its own launch video.</p>
+    <p class="jp">チームはLaunchLocalに自社サイトのURLを渡し、自分たちのローンチ動画を作りました。</p>
+  </div>
+</section>
+
+<section class="slide" data-n="10">
   <h2>Links and numbers</h2>
   <p class="jp">リンクと数値</p>
   <div class="body">
@@ -319,7 +370,7 @@ tr:last-child td{border-bottom:0}
   });
   // click: left quarter of the screen goes back, the rest goes forward
   document.addEventListener('click',function(e){
-    if(e.target.closest('a'))return;
+    if(e.target.closest('a,video'))return;
     go(e.clientX<window.innerWidth/4?i-1:i+1);
   });
   window.addEventListener('hashchange',function(){go((parseInt(location.hash.slice(1),10)||1)-1)});

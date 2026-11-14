@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docs: LaunchLocal</title>
+<meta name="description" content="How a LaunchLocal run works, the files in a run directory, how to add a market pack and how to run it yourself.">
+<meta name="theme-color" content="#c5361d">
+<meta property="og:image" content="../img/waiting-screen.png">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../"><img src="../logo.svg" alt="LaunchLocal logo" width="268" height="48"></a>
+    <nav aria-label="Main">
+      <a href="../">Home</a>
+      <a href="../demo/">Recorded runs</a>
+      <a href="./" aria-current="page">Docs</a>
+      <a href="../pricing/">Pricing</a>
+      <a href="../slides/">Slides</a>
+      <a href="https://github.com/wei/launchlocal">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <div class="wrap">
+    <p class="kicker">DOCUMENTATION</p>
+    <h1>How LaunchLocal works</h1>
+    <p class="lede">LaunchLocal takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source. The full reference is the <a href="https://github.com/wei/launchlocal">README in the repository</a>.</p>
+
+    <h2 id="run">How a run works</h2>
+    <ol>
+      <li><b>Input.</b> You paste a product URL and pick a market. Japan (<code>ja-JP</code>) is the default. The reverse pack (<code>en-US</code>) launches a Japanese product globally in English.</li>
+      <li><b>Research.</b> 12 agents run in parallel with Tavily. 5 read the official site (brand, product, pricing, customers, docs) and 7 search the target market using the areas and queries in the market pack. A language model turns the pages into facts. Each fact keeps its source URL.</li>
+      <li><b>Script.</b> A language model writes a four-scene script (hook, product, proof, call to action) in the local language, plus a design brief. A sentence stays only if it cites a <code>fact_id</code> that exists in <code>facts.json</code>.</li>
+      <li><b>Voice.</b> A Kokoro voice model on a Nosana GPU deployment narrates each scene.</li>
+      <li><b>Compose.</b> Local code builds a baseline Hyperframes HTML composition from the script, the brand profile and the audio.</li>
+      <li><b>Code.</b> CodeAF writes <code>theme.css</code>, a stylesheet that makes the video look like the official site, adapted to the market's style rules. It runs beside research, script and voice. The theme is used only if it passes the checks and the Hyperframes lint.</li>
+      <li><b>Render.</b> A Daytona sandbox renders the composition to MP4 with headless Chrome and FFmpeg, and serves the result.</li>
+      <li><b>Buyer gate.</b> A local buyer persona from the market pack scores the script of each cut. Three verdicts: <code>approve</code>; <code>reject</code>, when an unused sourced fact would fix the concern, in which case the script is revised and cut 2 is voiced and rendered; and <code>approve_with_gaps</code>, when the video already uses the evidence that exists and the rest is for the vendor to provide.</li>
+      <li><b>Output.</b> The launch video and an interactive brief. Clicking a claim opens its source.</li>
+    </ol>
+    <p>AgentField runs steps 2 to 8. Each stage is its own node in the workflow graph.</p>
+
+    <h2 id="run-directory">The run directory</h2>
+    <p>Stages communicate only through files in <code>runs/&lt;run_id&gt;/</code>. Each stage can be run alone from the command line against a run directory.</p>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>File</th><th>Written by</th><th>Contents</th></tr></thead>
+      <tbody>
+        <tr><td><code>input.json</code></td><td>server, agents</td><td>Run id, URL and market.</td></tr>
+        <tr><td><code>events.jsonl</code></td><td>every stage</td><td>One JSON object per line. The waiting screen is a live view of this stream.</td></tr>
+        <tr><td><code>brand.json</code></td><td>research</td><td>Brand profile from the official site.</td></tr>
+        <tr><td><code>assets/</code></td><td>research</td><td>Downloaded logo, images and screenshots referenced by <code>brand.json</code>.</td></tr>
+        <tr><td><code>facts.json</code></td><td>research</td><td>List of sourced facts.</td></tr>
+        <tr><td><code>script.json</code></td><td>script</td><td>Scenes, narration, on-screen text, changes and the design brief.</td></tr>
+        <tr><td><code>audio/&lt;scene_id&gt;.wav</code></td><td>voice</td><td>Narration per scene.</td></tr>
+        <tr><td><code>video.mp4</code>, <code>poster.png</code></td><td>render</td><td>Final video and a still.</td></tr>
+        <tr><td><code>render.json</code></td><td>render</td><td>Video, poster, preview URL, sandbox id, render seconds and cut.</td></tr>
+        <tr><td><code>gate.json</code></td><td>script</td><td>Buyer gate rounds.</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2 id="market-pack">Add a market pack</h2>
+    <p>A market is one JSON file in <code>packs/</code>. The repository has <code>packs/ja-JP.json</code> and <code>packs/en-US.json</code>. To add a market, copy one to <code>packs/&lt;id&gt;.json</code> and edit:</p>
+    <ul>
+      <li><code>language</code>, <code>language_name</code>, <code>country</code>, <code>currency</code></li>
+      <li><code>voice</code>: the Kokoro voice and language code</li>
+      <li><code>search</code>: country and local sites</li>
+      <li><code>research_areas</code>: the market research agents and their query templates</li>
+      <li><code>copy_rules</code>, <code>style_rules</code>, <code>cta_examples</code>: how the script and the video should read and look</li>
+      <li><code>buyer_persona</code>: who reviews the cut, what they care about, and the questions they score</li>
+    </ul>
+    <p>The server lists every file in <code>packs/</code> (<code>GET /api/packs</code>), so the new market appears in the picker without code changes.</p>
+
+    <h2 id="run-it">Run it</h2>
+    <p>You need Python 3.12 with uv. Put <code>TAVILY_API_KEY</code>, <code>DAYTONA_API_KEY</code>, <code>NOSANA_API_KEY</code> and <code>OLLAMA_API_KEY</code> in <code>.env</code> at the project root.</p>
+<pre><code>export PATH="$HOME/.agentfield/bin:$HOME/.codeaf/bin:$PATH"
+
+# 1. AgentField control plane, port 8080
+af server --open=false
+
+# 2. LaunchLocal agent node, port 8001
+.venv/bin/python -m launchlocal.agents
+
+# 3. Web app, port 8787
+.venv/bin/python -m launchlocal.server</code></pre>
+    <p>Open <code>http://127.0.0.1:8787</code>, paste a URL and pick a market. The workflow graph is at <code>http://localhost:8080/ui/</code> under Workflows.</p>
+    <p>Run single stages against a run directory:</p>
+<pre><code>.venv/bin/python -m launchlocal.voice &lt;run_id&gt; [market]
+.venv/bin/python -m launchlocal.compose &lt;run_id&gt;
+.venv/bin/python -m launchlocal.coder &lt;run_id&gt; [market] --theme
+.venv/bin/python -m launchlocal.render &lt;run_id&gt;</code></pre>
+
+    <h2 id="fallbacks">Fallbacks</h2>
+    <p>Each external dependency has a named fallback that writes a log event to <code>events.jsonl</code> when it is used.</p>
+    <ul>
+      <li><b>Language model chain.</b> Nosana hosted inference first, then the project's own Nosana GPU deployment when one is configured, then Ollama Cloud. Each run logs which provider served it.</li>
+      <li><b>Local voice.</b> If the Nosana voice endpoint fails, the same Kokoro model runs on the local CPU.</li>
+      <li><b>Local render.</b> Used only when <code>LAUNCHLOCAL_RENDER=local</code> is set. It is never chosen silently.</li>
+      <li><b>Baseline look.</b> If the CodeAF theme fails its checks, the video renders with the baseline stylesheet.</li>
+      <li><b>Cached-run replay.</b> A recorded run opened with <code>?replay=1</code> replays its recorded events and shows a "CACHED RUN" badge.</li>
+    </ul>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <nav aria-label="Footer">
+      <a href="../">Home</a>
+      <a href="../demo/">Recorded runs</a>
+      <a href="../pricing/">Pricing</a>
+      <a href="../slides/">Slides</a>
+      <a href="https://github.com/wei/launchlocal">GitHub</a>
+    </nav>
+    <span>LaunchLocal. Agent Forge AI Hackathon Tokyo, 14 November 2026.</span>
+  </div>
+</footer>
+</body>
+</html>
