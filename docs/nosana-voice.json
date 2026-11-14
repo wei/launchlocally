@@ -1,0 +1,10 @@
+{
+  "deployment_id": "7cVoC6ZGh7yoZNushn377U13EA3rvw4B26QuVVFr2dWi",
+  "endpoint": "https://5BdSWyBFzdsvkzPNCLAbdFAC6J4L9s4cG5WuLtpQL68H.node.k8s.prd.nos.ci",
+  "image": "ghcr.io/remsky/kokoro-fastapi-gpu:latest",
+  "market": "7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq",
+  "market_name": "NVIDIA 3060 (PREMIUM)",
+  "usd_per_hour": 0.0436,
+  "timeout_min": 300,
+  "created_at": "2026-11-14T06:19:46.938Z"
+}
