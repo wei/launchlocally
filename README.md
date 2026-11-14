@@ -129,6 +129,7 @@ Live path: Tavily, Nosana hosted inference, the Nosana GPU voice deployment, Cod
 
 | Fallback | When it is used | What happens |
 |----------|-----------------|--------------|
+| Language model chain | Nosana's hosted catalog lists no chat model, or a call fails | `llm.py` tries Nosana hosted inference, then the project's own Nosana GPU deployment when `docs/nosana-llm.json` exists, then Ollama Cloud. A failing provider is skipped for 90 seconds. Each run logs which provider served it, with `fallback: true` when it was not the first. This is not hypothetical: the hosted Qwen model left the catalog at 15:52 JST on the build day. |
 | Local voice | The Nosana voice endpoint fails | `voice.py` runs the same Kokoro model on the local CPU and logs `fallback: true`. |
 | Local render | `LAUNCHLOCAL_RENDER=local` is set | `render.py` renders with the same pinned Hyperframes CLI on the local machine. `render.json` has `preview_url: null` and `sandbox_id: null`. It is never chosen silently. |
 | Baseline look | CodeAF fails or times out, its theme uses the network or hides elements, or the composition fails lint with the theme | `coder.py` sets the theme aside and logs `baseline look kept: <reason>`. The video renders with the baseline stylesheet and the run continues. |

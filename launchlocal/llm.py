@@ -43,7 +43,7 @@ def providers() -> list[dict]:
     if os.environ.get("OLLAMA_API_KEY"):
         out.append({"id": "ollama-cloud", "label": "Ollama Cloud (fallback)", "base_url": "https://ollama.com/v1",
                     "key": os.environ["OLLAMA_API_KEY"], "model": os.environ.get("LAUNCHLOCAL_FALLBACK_MODEL", "deepseek-v4.1-flash"),
-                    "timeout": 90, "qwen": False})
+                    "timeout": 90, "qwen": False, "extra": {"reasoning_effort": "none"}})  # it reasons by default and can spend the whole budget
     return out
 
 
@@ -85,34 +85,43 @@ async def chat(system: str, user: str, max_tokens: int = 2000, temperature: floa
         raise RuntimeError("no language model provider configured (NOSANA_API_KEY or OLLAMA_API_KEY)")
     why, last_exc = "", None
     for p in chain:
-        if _down.get(p["id"], 0) > time.time():
+        final = p is chain[-1]
+        if not final and _down.get(p["id"], 0) > time.time():
             why = why or _down.get(p["id"] + ":why", "recent failure")
             continue
-        try:
-            client = _client(p)
-            model = await _model(p, client)
-            t = time.time()
-            r = await client.chat.completions.create(
-                model=model,
-                messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
-                max_tokens=max_tokens,
-                temperature=temperature,
-                **({"extra_body": {"chat_template_kwargs": {"enable_thinking": False}}} if p["qwen"] else {}),
-            )
-            text = re.sub(r"<think>.*?</think>", "", r.choices[0].message.content or "", flags=re.S).strip()
-            if not text:
-                raise RuntimeError("empty completion")
-            last_latency, last_provider = time.time() - t, p["id"]
-            print(f"[llm] {p['id']} {model} {last_latency:.1f}s {r.usage.completion_tokens if r.usage else '?'} tok", file=sys.stderr)
-            _note(p, model, chain[0], why)
-            return text
-        except Exception as e:  # any failure moves on to the next provider; exception text may hold headers, keep the class
-            last_exc = e
-            reason = str(e)[:120] if isinstance(e, RuntimeError) else type(e).__name__
-            _down[p["id"]], _down[p["id"] + ":why"] = time.time() + RETRY_AFTER_S, reason
-            _models.pop(p["id"], None)
-            why = why or reason
-            print(f"[llm] {p['id']} failed: {reason}", file=sys.stderr)
+        extra = dict(p.get("extra") or {})
+        if p["qwen"]:
+            extra["chat_template_kwargs"] = {"enable_thinking": False}
+        # The last provider is the only way left, so it is retried with backoff and never marked down.
+        for attempt in range(3 if final else 1):
+            try:
+                client = _client(p)
+                model = await _model(p, client)
+                t = time.time()
+                r = await client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    **({"extra_body": extra} if extra else {}),
+                )
+                text = re.sub(r"<think>.*?</think>", "", r.choices[0].message.content or "", flags=re.S).strip()
+                if not text:
+                    raise RuntimeError("empty completion")
+                last_latency, last_provider = time.time() - t, p["id"]
+                print(f"[llm] {p['id']} {model} {last_latency:.1f}s {r.usage.completion_tokens if r.usage else '?'} tok", file=sys.stderr)
+                _note(p, model, chain[0], why)
+                return text
+            except Exception as e:  # exception text may hold headers, so only RuntimeError text is kept
+                last_exc = e
+                reason = str(e)[:120] if isinstance(e, RuntimeError) else type(e).__name__
+                _models.pop(p["id"], None)
+                print(f"[llm] {p['id']} failed: {reason}", file=sys.stderr)
+                if final:
+                    await asyncio.sleep(0.6 * (attempt + 1))
+                else:
+                    _down[p["id"]], _down[p["id"] + ":why"] = time.time() + RETRY_AFTER_S, reason
+                why = why or reason
     raise RuntimeError(f"all language model providers failed: {why}") from last_exc
 
 
