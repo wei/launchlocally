@@ -6,7 +6,7 @@
 
 **Paste a URL. Launch like a local.**
 
-LaunchLocally takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source.
+Companies entering Japan usually translate their launch material, but Japanese buyers expect local content presented their way. LaunchLocally takes a product URL, researches the product and the Japanese market, and makes a narrated launch video in Japanese. Every claim on screen links to its source, and an agent playing a Japanese enterprise IT head reviews the script as an approval gate and can send it back for revisions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
