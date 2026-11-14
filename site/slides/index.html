@@ -149,6 +149,9 @@ b,.acc{color:var(--accent);font-weight:700}
 .links dt span{font-weight:500;font-size:.85em;margin-left:.5em}
 .links dd{font-size:1.6em;font-weight:700;color:var(--accent);word-break:break-all}
 .links a{color:inherit}
+.linkrow{display:flex;justify-content:space-between;align-items:center;gap:2em;margin-bottom:1.6em}
+.linkrow .links{margin-bottom:0}
+.qr img{display:block;width:9.5em;height:9.5em;border-radius:.4em}
 .stat{text-align:center;padding:1.1em 1em}
 .stat .v{font-size:3.6em;font-weight:900;color:var(--accent);line-height:1.1;word-break:break-all}
 .stat .l{font-size:1.15em;font-weight:700;margin-top:.4em}
@@ -339,11 +342,12 @@ b,.acc{color:var(--accent);font-weight:700}
   <h2>Links and numbers</h2>
   <p class="jp">リンクと数値</p>
   <div class="body">
-    <dl class="links">
+    <div class="linkrow"><dl class="links">
       <dt>Repository<span>リポジトリ</span></dt><dd>github.com/wei/launchlocally</dd>
       <dt>Demo<span>デモ</span></dt><dd>wei.github.io/launchlocally</dd>
       <dt class="screen-only">Slides<span>スライド</span></dt><dd class="screen-only"><a href="launchlocally-slides.pdf">PDF</a></dd>
     </dl>
+    <a class="qr" href="https://wei.github.io/launchlocally/"><img src="../img/qr-home.svg" alt="QR code for wei.github.io/launchlocally"></a></div>
     <div class="cols3">
       <div class="card stat"><div class="v">40+</div><p class="l">sourced facts per run</p><p class="jp">1回の実行で得る出典付きの事実</p></div>
       <div class="card stat"><div class="v">18</div><p class="l">agents per run</p><p class="jp">1回の実行で動くエージェント</p></div>
