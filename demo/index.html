@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LaunchLocally recorded runs</title>
+<style>
+body{margin:0;background:#0b0d10;color:#f2f4f7;font:18px/1.5 system-ui,-apple-system,"Noto Sans JP",sans-serif}
+main{max-width:960px;margin:0 auto;padding:56px 20px}
+h1{font-size:48px;margin:0}h1 i{font-style:normal;color:#2ecc71}p{color:#aab2bd;max-width:60ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:28px 0}
+.card{display:flex;flex-direction:column;gap:4px;padding:20px;border:1px solid #2a2f37;border-radius:12px;background:#14171c;color:inherit;text-decoration:none}
+.card:hover{border-color:#2ecc71}.card b{font-size:24px}.card span{color:#aab2bd;font-size:15px}
+.links a{color:#2ecc71;margin-right:20px}img{width:100%;border-radius:12px;margin-top:28px}
+.note{font-size:15px}
+</style></head><body><main>
+<h1>Launch<i>Locally</i> recorded runs</h1>
+<p>Paste a URL. Launch like a local. Agents research a product and a target market, then write, voice and render a launch video in the local language and style, with an interactive brief where every claim opens its source.</p>
+<p class="note">These are recorded runs replayed in your browser, so each page shows a CACHED RUN badge. The live app runs the same pipeline on demand.</p>
+<div class="cards">
+<a class="card" href="daytona-japan/"><b>Daytona</b><span>https://www.daytona.io to ja-JP</span><span>41 sourced facts</span></a>
+<a class="card" href="tavily-japan/"><b>Tavily</b><span>https://www.tavily.com to ja-JP</span><span>43 sourced facts</span></a>
+<a class="card" href="nosana-japan/"><b>Nosana</b><span>https://nosana.com to ja-JP</span><span>16 sourced facts</span></a>
+<a class="card" href="agentfield-japan/"><b>CodeAF</b><span>https://agentfield.ai to ja-JP</span><span>18 sourced facts</span></a>
+<a class="card" href="launchlocally-intl/"><b>LaunchLocally</b><span>https://wei.github.io/launchlocally/ to en-INTL</span><span>42 sourced facts</span></a>
+</div>
+<p class="links"><a href="../">LaunchLocally home</a><a href="../slides/">Slides</a><a href="https://github.com/wei/launchlocally">GitHub repository</a></p>
+<img src="../architecture.svg" alt="LaunchLocally architecture: AgentField runs research on Tavily, script and buyer gate on Nosana, voice on a Nosana GPU, CodeAF restyle, and render in a Daytona sandbox">
+</main></body></html>
