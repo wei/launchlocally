@@ -21,7 +21,7 @@ It prints the local URL, the workflow-graph URL and the public URL. Then:
 2. Check the voice deployment answers: `curl -s "$(jq -r .endpoint docs/nosana-voice.json)/health"` should print `{"status":"healthy"}`. It stops around 20:20 JST.
 3. Start one throwaway run and let it finish, so the Daytona sandbox and the model providers are warm.
 4. Turn the laptop volume up. The video has Japanese narration.
-5. Keep the cached runs ready in the "past runs" list on the launcher: `daytona-japan`, `tavily-japan`, `nosana-japan`, `agentfield-japan`, and LaunchLocally's own run `launchlocally-intl`.
+5. Keep the cached runs ready in the "past runs" list on the launcher: `daytona-japan`, `tavily-japan`, `nosana-japan`, `agentfield-japan`, `aibuilders-japan`, and LaunchLocally's own run `launchlocally-intl`.
 6. Tavily budget: a live run costs about 30 credits. Do not rehearse without `--rehearsal`.
 
 Stop everything afterwards: `scripts/start.sh --stop`.
@@ -31,7 +31,7 @@ Stop everything afterwards: `scripts/start.sh --stop`.
 | Time | Do | Say |
 |------|----|-----|
 | 0:00 | Launcher on screen | "A company entering Japan translates its launch material. Local buyers expect local proof, local tone and a local format. LaunchLocally does that from one URL." |
-| 0:10 | Ask a sponsor judge to pick: Daytona, Tavily, Nosana or AgentField. Click that button. Market stays Japan. | "Pick your own product. We will launch it in Japan, in Japanese, right now." |
+| 0:10 | Ask a judge to pick: Daytona, Tavily, Nosana, AgentField or AI Builders. Click that button. Market stays Japan. | "Pick your own product. We will launch it in Japan, in Japanese, right now." |
 | 0:20 | Research column fills | "Twelve agents are searching with **Tavily**: five read the official site, seven search the Japanese web for competitors, pricing, trust requirements and how local buyers talk. Every fact keeps its source." |
 | 0:40 | Storyboard cards fill; infrastructure column | "A strategist writes the script. **CodeAF** is writing the theme so the video looks like the official site. The voice is generated on a **Nosana** GPU." |
 | 0:55 | Buyer gate panel shows the stamp | "This is the part I like. A local buyer agent, the head of IT at a Japanese enterprise, reviews it. It can reject the cut, and the system fixes what it rejected." |
