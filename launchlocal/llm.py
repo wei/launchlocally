@@ -39,11 +39,14 @@ def providers() -> list[dict]:
     if gpu.exists():
         d = json.loads(gpu.read_text())
         out.append({"id": "nosana-gpu", "label": "Nosana GPU deployment", "base_url": d["endpoint"].rstrip("/") + "/v1",
-                    "key": d.get("api_key") or "none", "model": d["model"], "timeout": 120, "qwen": "qwen" in d["model"].lower()})
+                    "key": d.get("api_key") or "none", "model": d["model"], "timeout": 120, "qwen": False})  # vLLM serves an instruct model with no thinking mode
     if os.environ.get("OLLAMA_API_KEY"):
         out.append({"id": "ollama-cloud", "label": "Ollama Cloud (fallback)", "base_url": "https://ollama.com/v1",
                     "key": os.environ["OLLAMA_API_KEY"], "model": os.environ.get("LAUNCHLOCAL_FALLBACK_MODEL", "deepseek-v4.1-flash"),
                     "timeout": 90, "qwen": False, "extra": {"reasoning_effort": "none"}})  # it reasons by default and can spend the whole budget
+    order = [x.strip() for x in os.environ.get("LAUNCHLOCAL_LLM_ORDER", "").split(",") if x.strip()]
+    if order:  # e.g. "nosana-gpu,nosana-hosted,ollama-cloud" puts our own Nosana deployment first (faster, smaller model)
+        out.sort(key=lambda p: order.index(p["id"]) if p["id"] in order else len(order))
     return out
 
 

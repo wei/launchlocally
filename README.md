@@ -69,7 +69,7 @@ flowchart LR
 | CodeAF | Coding harness. Runs headless on an Ollama Cloud model and writes the theme stylesheet that makes the video look like the official site. | The video keeps the baseline look and does not match the official site. | [`launchlocal/coder.py`](launchlocal/coder.py): `_run_codeaf` runs `codeaf exec`; `build_theme` writes `theme.css` in a scratch copy and checks it; `theme_passes_lint` lints the real composition with the theme applied. [`launchlocal/compose.py`](launchlocal/compose.py) appends the theme. |
 | Tavily | Map, extract and search for 12 parallel research agents: 5 on the official site, 7 on the target market. | No sourced facts, so the script has nothing it is allowed to say. | [`launchlocal/research.py`](launchlocal/research.py): `run_research` and its inner `call`, which invokes `map`, `extract` and `search` on `AsyncTavilyClient`. |
 | Nosana (hosted inference) | Qwen extracts facts, writes the script and the design brief, and plays the buyer gate. | No facts, no script and no review. | [`launchlocal/llm.py`](launchlocal/llm.py): `chat`, `chat_json`. [`launchlocal/script.py`](launchlocal/script.py): `write_script`, `_design_brief`, `buyer_gate`, `revise_script`. [`launchlocal/research.py`](launchlocal/research.py): `_Model.ask`. |
-| Nosana (GPU deployment) | Runs the Kokoro voice model that narrates each scene. | The video has no narration. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployment: [`docs/nosana-voice.md`](docs/nosana-voice.md). |
+| Nosana (GPU deployments) | Two deployments created through Nosana's REST API. One runs the Kokoro voice model that narrates each scene. The other runs a vLLM server with Qwen2.5-14B, the second text provider when the hosted catalog has no chat model. | The video has no narration, and text generation depends on a catalog that changed during the build day. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployments: [`docs/nosana-voice.md`](docs/nosana-voice.md), [`docs/nosana-llm.md`](docs/nosana-llm.md); `providers` in [`launchlocal/llm.py`](launchlocal/llm.py) reads `docs/nosana-llm.json`. |
 | Daytona | Sandbox that renders the Hyperframes HTML composition to MP4 with headless Chrome and FFmpeg, and serves the result. | Nowhere isolated to run agent-written code, and no hosted video. | [`launchlocal/render.py`](launchlocal/render.py): `_sandbox` creates or reuses the sandbox; `_remote` runs the render commands; `render` uploads, renders and downloads. Setup: [`docs/daytona-render.md`](docs/daytona-render.md). |
 
 ## Open source we build on
@@ -91,7 +91,7 @@ flowchart LR
 | App | uv, qrcode.js | Python environment; QR code on the brief |
 | Inspiration | /brag agent skill (latent-spaces/brag), LaunchCut | Project-to-launch-video as an agent task; LaunchLocally adds live market research, localization, a buyer review and sourced claims |
 
-Models: Kokoro for voice. Text generation uses Nosana hosted inference when its catalog lists a chat model, and otherwise DeepSeek V4.1 Flash on Ollama Cloud. CodeAF runs Kimi K2.7 Code on Ollama Cloud.
+Models: Kokoro for voice. Text generation tries Nosana hosted inference (Qwen 3.8 27B, when the catalog lists it), then Qwen2.5-14B on the project's own Nosana GPU deployment, then DeepSeek V4.1 Flash on Ollama Cloud. CodeAF runs Kimi K2.7 Code on Ollama Cloud.
 
 ## Market packs
 
@@ -159,9 +159,9 @@ Live path: Tavily, Nosana hosted inference, the Nosana GPU voice deployment, Cod
 
 ## Limits
 
-- The source check confirms that each sentence cites an existing fact and that its numbers appear in the source. It does not check that the source fully supports the wording.
+- The source check confirms that each sentence cites an existing fact, that its numbers appear in the source, and (`_verify_support` in `script.py`) that a fact about a competitor or the market is not presented as a claim about the product. The last check uses a model and can miss cases.
 - The buyer gate allows one revision. Cut 2 is final whether or not it is approved.
-- The video has four scenes. Two market packs exist: `ja-JP` and `en-US`.
+- The video has four scenes. Three market packs exist: `ja-JP`, `en-US` and `en-INTL` (English, for international companies entering Japan; used for LaunchLocally's own launch video).
 - The Nosana voice deployment has a job timeout and must be recreated after it ends. The Daytona sandbox is kept warm and stays billable until stopped.
 - The Daytona preview URL shows a Daytona warning page in phone browsers. The MP4 is also downloaded to the run directory and served by the web app.
 - The AgentField control plane runs locally in this build.

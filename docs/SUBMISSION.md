@@ -22,20 +22,20 @@ https://github.com/wei/launchlocally
 
 ## Live Demo / Deployment URL / デモ・デプロイURL
 
-TODO confirm once GitHub Pages is live: https://wei.github.io/launchlocally/
+https://wei.github.io/launchlocally/
 
 ## Slide Deck URL / スライドURL
 
-TODO confirm once GitHub Pages is live: https://wei.github.io/launchlocally/slides/
+https://wei.github.io/launchlocally/slides/
 
 ## Partner Technologies Used / 使用したパートナー技術
 
 AgentField + CodeAF, Tavily, Daytona, Nosana (all four, each at code level).
 
-- AgentField: control plane that runs every agent stage and records the workflow graph. CodeAF: coding harness that rewrites the video composition's styling to match the product's brand.
+- AgentField: control plane that runs every agent stage and records the workflow graph. CodeAF: coding harness that writes the theme that styles the video like the product's official site.
 - Tavily: map, extract and search across 12 parallel research areas; every fact keeps its source URL and a verbatim excerpt.
 - Daytona: sandbox that renders the agent-written video composition and serves the result.
-- Nosana: hosted Qwen inference writes the script and plays the local buyer; a Nosana GPU deployment runs the voice model that narrates the video.
+- Nosana: hosted Qwen inference writes the script and plays the local buyer; two Nosana GPU deployments run the voice model that narrates the video and a vLLM server that takes over text generation when the hosted catalog has no chat model.
 
 ## What does your agent do? (2-3 sentences) / エージェントの概要(2-3文)
 

@@ -132,6 +132,9 @@ async def _verify_support(script, facts, brand, pack, rd):
                 bad[k] = "names the product but cites only facts about other companies or the market"
             items.append({"key": k, "text": text, "facts": [f["claim_en"] for f in cited]})
         for i, it in enumerate(sc.get("on_screen", [])):
+            if it.get("fact_id") not in by_id:  # enforce() drops these; never trust the model's ids here
+                bad[f"{sc['id']}.{i}"] = "cites a fact id that does not exist"
+                continue
             items.append({"key": f"{sc['id']}.{i}", "text": f"{it.get('text_en', '')} / {it.get('text_local', '')}",
                           "facts": [by_id[it["fact_id"]]["claim_en"]]})
     profile = f"{brand.get('name')}: {brand.get('tagline', '')}. Category: {brand.get('category', '')}. (from the official homepage)"
@@ -318,8 +321,8 @@ async def write_script(run_dir: Path, pack: dict) -> None:
         _design_brief(rd, pack, brand, facts),
     )
     script = _assemble(draft, pack, brand)
+    await _fix_length(script, facts, brand, pack, rd)  # runs enforce() first: invalid fact ids are gone after this
     await _verify_support(script, facts, brand, pack, rd)
-    await _fix_length(script, facts, brand, pack, rd)
     await _fix_display(script, facts, brand, pack, rd)
     _strip_bad_chars(script)
     script["design_brief"] = brief
@@ -432,8 +435,8 @@ async def revise_script(run_dir: Path, pack: dict, round: dict) -> None:
         3000,
     )
     script = _assemble(draft, pack, brand, old)
+    await _fix_length(script, facts, brand, pack, rd)  # runs enforce() first: invalid fact ids are gone after this
     await _verify_support(script, facts, brand, pack, rd)
-    await _fix_length(script, facts, brand, pack, rd)
     await _fix_display(script, facts, brand, pack, rd)
     _strip_bad_chars(script)
     write_json(rd / "script.json", script)
