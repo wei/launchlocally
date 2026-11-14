@@ -429,7 +429,7 @@ function onEvent(e) {
   $('#cS').textContent = V.urls.size;
 
   const st = stageOf(e);
-  if (st >= 0 && st !== V.stage) { if (st < V.stage && st === 1) V.cut++; V.stage = st; }
+  if (st >= 0 && st !== V.stage) V.stage = st;  // stages overlap (theme runs beside script), so the cut number comes from the event, not from stage order
   if (+d.cut > V.cut) V.cut = +d.cut;
   if (/^(scout|market)\./.test(a)) laneEvent(e);
 
