@@ -65,12 +65,14 @@ def export(run_id: str) -> dict:
         ("await fetch(`/api/runs/${encodeURIComponent(runId)}/state`)", "await fetch('state.json')"),
         ("new EventSource(`/api/runs/${encodeURIComponent(runId)}/events` + (replay ? `?replay=1&speed=${encodeURIComponent(speed)}` : ''))", "new StaticES()"),
         ("(S.public_base || location.origin) + '/run/' + encodeURIComponent(runId)", "location.href.split('?')[0]"),
+        ('<a class="logo" href="/"', '<a class="logo" href="../"'),  # on the static site the logo goes to the recorded-runs index
     ]
     for old, new in swaps:
         assert page.count(old) == 1, f"run.html changed, expected exactly one: {old[:60]}"
         page = page.replace(old, new)
     page = page.replace("`/runs/${encodeURIComponent(runId)}/", "`./")
     assert "/runs/" not in page and "/api/" not in page, "unpatched server path left in static page"
+    assert 'href="/' not in page and "href='/" not in page, "root-relative link left in static page (404 under /launchlocally/)"
     page = page.replace("<script>", SHIM + "<script>", 1)
     (out / "index.html").write_text(page, encoding="utf-8")
     brand, inp = state.get("brand") or {}, state.get("input") or {}
