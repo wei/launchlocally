@@ -1,6 +1,6 @@
 # Demo run-book
 
-Two to three minutes on stage. A full run takes 80 to 140 seconds, so the run
+Two to three minutes on stage. A full run takes 90 to 160 seconds, so the run
 itself is the demo: start it in the first 15 seconds and talk over the waiting
 screen.
 
@@ -8,8 +8,12 @@ screen.
 
 ```sh
 cd /Users/wei/Documents/Projects/Personal/launchlocal
-scripts/start.sh --tunnel     # control plane, agent node, web app, public URL for the QR code
+scripts/start.sh --tunnel --rehearsal   # practice: reuses saved research, no Tavily credits
+scripts/start.sh --tunnel               # judged demo: live Tavily research, about 30 credits per run
 ```
+
+Each start prints a new public URL. A run for a sponsor that already ran today (daytona.io, tavily.com,
+nosana.com, agentfield.ai) uses saved research in rehearsal mode and logs "CACHED RESEARCH".
 
 It prints the local URL, the workflow-graph URL and the public URL. Then:
 
@@ -17,7 +21,8 @@ It prints the local URL, the workflow-graph URL and the public URL. Then:
 2. Check the voice deployment answers: `curl -s "$(jq -r .endpoint docs/nosana-voice.json)/health"` should print `{"status":"healthy"}`. It stops around 20:20 JST.
 3. Start one throwaway run and let it finish, so the Daytona sandbox and the model providers are warm.
 4. Turn the laptop volume up. The video has Japanese narration.
-5. Keep the cached runs ready in the "past runs" list on the launcher: `daytona-ja`, `tavily-ja`, `nosana-ja`, `agentfield-ja`.
+5. Keep the cached runs ready in the "past runs" list on the launcher: `daytona-japan`, `tavily-japan`, `nosana-japan`, `agentfield-japan`, and LaunchLocally's own run `launchlocally-intl`.
+6. Tavily budget: a live run costs about 30 credits. Do not rehearse without `--rehearsal`.
 
 Stop everything afterwards: `scripts/start.sh --stop`.
 
@@ -50,6 +55,12 @@ the launcher with replay: `/run/<id>?replay=1&speed=3`. The page shows a
 | Daytona render fails | Renderer error on the infrastructure column | Open the cached run for that sponsor. For the next run: `LAUNCHLOCAL_RENDER=local scripts/start.sh`. |
 | Venue network slow | Research lanes stall | Switch to the cached run with replay. |
 | QR does not open | Phone shows an error | The tunnel died. Show the brief on the laptop. |
+
+## Dogfood line
+
+"We pointed LaunchLocally at its own website. This is the launch video it made for itself." It is on the
+homepage, https://wei.github.io/launchlocally/, and on the slide "We launched ourselves with it". Its buyer
+agent rejected both cuts, partly because it would not trust a hackathon project. That is the honest result.
 
 ## Reverse direction
 
