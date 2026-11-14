@@ -109,6 +109,69 @@ async def _fix_length(script, facts, brand, pack, rd):
     enforce(script, facts, brand, pack, rd)  # shortened text could carry a new number
 
 
+async def _verify_support(script, facts, brand, pack, rd):
+    """Check WHO each claim is about. A fact about a competitor or the market must not become a claim about the product.
+
+    Two layers: a rule (text names the product but no cited fact is about the product), then one model call that
+    judges every headline, narration line and on-screen item against its cited facts. Unsupported on-screen items
+    are dropped; unsupported headlines and narration are replaced with a sourced product claim.
+    """
+    by_id = {f["id"]: f for f in facts}
+    name = (brand.get("name") or script.get("product") or "").lower()
+
+    def about_product(f):
+        return f.get("scope") == "product" or (name and name in f.get("claim_en", "").lower())
+
+    items, bad = [], {}
+    for sc in script["scenes"]:
+        cited = [by_id[i] for i in sc["fact_ids"] if i in by_id]
+        for key in ("headline", "narration"):
+            text = f"{sc.get(key + '_en', '')} / {sc.get(key + '_local', '')}"
+            k = f"{sc['id']}.{key}"
+            if name and name in text.lower() and not any(about_product(f) for f in cited):
+                bad[k] = "names the product but cites only facts about other companies or the market"
+            items.append({"key": k, "text": text, "facts": [f["claim_en"] for f in cited]})
+        for i, it in enumerate(sc.get("on_screen", [])):
+            items.append({"key": f"{sc['id']}.{i}", "text": f"{it.get('text_en', '')} / {it.get('text_local', '')}",
+                          "facts": [by_id[it["fact_id"]]["claim_en"]]})
+    try:
+        out = await llm.chat_json(
+            f"You are a strict fact checker for a launch video about the product {brand.get('name')}. For each item, decide whether "
+            "its text is fully supported by its facts. Check WHO each fact is about: a fact about another company, a competitor or the "
+            f"market in general does NOT support a claim that {brand.get('name')} has, holds or does that thing. A question, a general "
+            "statement about buyers, or a call to action needs no support beyond not contradicting the facts.",
+            json.dumps(items, ensure_ascii=False) + '\nReturn [{"key": ..., "supported": true or false, "reason": "short"}] for every item.', 1500)
+        for o in out if isinstance(out, list) else []:
+            if isinstance(o, dict) and o.get("supported") is False and o.get("key"):
+                bad.setdefault(o["key"], str(o.get("reason", "not supported by its cited facts"))[:160])
+    except Exception as e:
+        emit(rd, "strategist", "log", f"support check call failed ({e}); rule-based check only")
+    if not bad:
+        emit(rd, "strategist", "log", f"support check passed: {len(items)} lines match their cited facts")
+        return
+    product_facts = [f for f in facts if f.get("scope") == "product"]
+    for sc in script["scenes"]:
+        kept = []
+        for i, it in enumerate(sc.get("on_screen", [])):
+            if f"{sc['id']}.{i}" in bad:
+                emit(rd, "strategist", "log", f"dropped on-screen claim not supported by its source: {it.get('text_en', '')} ({bad[sc['id'] + '.' + str(i)]})")
+            else:
+                kept.append(it)
+        sc["on_screen"] = kept
+        for key in ("headline", "narration"):
+            k = f"{sc['id']}.{key}"
+            if k not in bad:
+                continue
+            cited = [by_id[i] for i in sc["fact_ids"] if i in by_id and about_product(by_id[i])] or product_facts
+            if not cited:
+                continue
+            f = cited[0]
+            emit(rd, "strategist", "log", f"{k} was not supported by its source ({bad[k]}); replaced with a sourced product claim from {f['id']}")
+            sc[key + "_local"], sc[key + "_en"] = f.get("claim_local") or f["claim_en"], f["claim_en"]
+            if f["id"] not in sc["fact_ids"]:
+                sc["fact_ids"] = [f["id"]] + sc["fact_ids"]
+
+
 def _display_limits(pack: dict) -> tuple[int, int]:
     """(headline, on-screen point) character limits; the video frame is fixed, so long text overflows it."""
     return (28, 22) if pack["language"] in ("ja", "zh", "ko") else (56, 36)
@@ -150,6 +213,16 @@ async def _fix_display(script, facts, brand, pack, rd):
                 it["text_local"], it["text_en"] = new["local"], new.get("en") or it["text_en"]
             else:
                 it["text_local"] = it["text_local"][: pt - 1] + "…"  # shortcut: visible cut; the full claim is in the brief
+
+
+def _strip_bad_chars(obj):
+    """Remove U+FFFD (a broken character some model outputs carry) from every string, in place."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            obj[k] = v.replace("\ufffd", "") if isinstance(v, str) else (_strip_bad_chars(v) or v)
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            obj[i] = v.replace("\ufffd", "") if isinstance(v, str) else (_strip_bad_chars(v) or v)
 
 
 def _hard_cut(text: str, pack: dict) -> str:
@@ -240,8 +313,10 @@ async def write_script(run_dir: Path, pack: dict) -> None:
         _design_brief(rd, pack, brand, facts),
     )
     script = _assemble(draft, pack, brand)
+    await _verify_support(script, facts, brand, pack, rd)
     await _fix_length(script, facts, brand, pack, rd)
     await _fix_display(script, facts, brand, pack, rd)
+    _strip_bad_chars(script)
     script["design_brief"] = brief
     write_json(rd / "script.json", script)
     for sc in script["scenes"]:
@@ -352,8 +427,10 @@ async def revise_script(run_dir: Path, pack: dict, round: dict) -> None:
         3000,
     )
     script = _assemble(draft, pack, brand, old)
+    await _verify_support(script, facts, brand, pack, rd)
     await _fix_length(script, facts, brand, pack, rd)
     await _fix_display(script, facts, brand, pack, rd)
+    _strip_bad_chars(script)
     write_json(rd / "script.json", script)
     for sc in script["scenes"]:
         emit(rd, "strategist", "progress", sc["headline_local"], scene=sc["id"], role=sc["role"], headline_en=sc["headline_en"], fact_ids=sc["fact_ids"])

@@ -409,7 +409,7 @@ async def run_research(run_dir: Path, url: str, pack: dict) -> None:
         queries = [q.replace("{product}", product).replace("{category}", brand["category"]) for q in area.get("queries", [])]
         responses = await asyncio.gather(*[
             call(agent, "search", query=q, country=pack.get("country") or pack.get("search", {}).get("country"),
-                 search_depth="advanced", include_raw_content="markdown", max_results=5, timeout=15)
+                 search_depth="basic", include_raw_content="markdown", max_results=5, timeout=15)  # basic is 1 credit, advanced 2
             for q in queries
         ])
         # Both query templates contribute evidence even when the first has many hits.

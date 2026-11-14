@@ -55,7 +55,29 @@ async def run_stage(stage: str, run_id: str, market: str = "ja-JP", cut: int = 1
     t0, out = time.time(), {}
     try:
         if stage == "scout_research":
-            if m := _module("research", rd):
+            src = os.environ.get("LAUNCHLOCAL_REUSE_RESEARCH_FROM", "")  # a run id whose research is copied, to save Tavily credits
+            if not (rd / "facts.json").exists() and src and (common.RUNS / src / "facts.json").exists():
+                import shutil
+                for name in ("facts.json", "brand.json"):
+                    shutil.copy2(common.RUNS / src / name, rd / name)
+                shutil.copytree(common.RUNS / src / "assets", rd / "assets", dirs_exist_ok=True)
+            if (rd / "facts.json").exists() and (rd / "brand.json").exists():
+                facts = common.read_json(rd / "facts.json")
+                common.emit(rd, "system", "log", f"CACHED RESEARCH: reusing {len(facts)} facts and the brand profile saved earlier; no Tavily calls in this run",
+                            cached=True, source=src or "this run")
+                saved = rd / "research_events.jsonl"  # the original research events, when the run was prepared from an earlier one
+                if saved.exists():
+                    import json
+                    now = time.time()
+                    with open(rd / "events.jsonl", "a", encoding="utf-8") as out:
+                        for i, line in enumerate(saved.read_text(encoding="utf-8").splitlines()):
+                            ev = json.loads(line)
+                            ev["ts"] = now + i * 0.03  # replayed quickly; the log line above says it is cached
+                            out.write(json.dumps(ev, ensure_ascii=False) + "\n")
+                else:
+                    for f in facts:  # replay the facts so the research lanes still fill in
+                        common.emit(rd, f"{'scout' if f.get('scope') == 'product' else 'market'}.{f.get('area', 'research')}", "fact", f.get("claim_en", ""), **f)
+            elif m := _module("research", rd):
                 # research.run_research fans out scout and market areas together
                 await m.run_research(rd, common.read_json(rd / "input.json")["url"], pack)
         elif stage == "market_research":

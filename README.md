@@ -72,6 +72,27 @@ flowchart LR
 | Nosana (GPU deployment) | Runs the Kokoro voice model that narrates each scene. | The video has no narration. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployment: [`docs/nosana-voice.md`](docs/nosana-voice.md). |
 | Daytona | Sandbox that renders the Hyperframes HTML composition to MP4 with headless Chrome and FFmpeg, and serves the result. | Nowhere isolated to run agent-written code, and no hosted video. | [`launchlocal/render.py`](launchlocal/render.py): `_sandbox` creates or reuses the sandbox; `_remote` runs the render commands; `render` uploads, renders and downloads. Setup: [`docs/daytona-render.md`](docs/daytona-render.md). |
 
+## Open source we build on
+
+| Area | Project | What it does here |
+|------|---------|-------------------|
+| Agents | AgentField | Agent control plane: one node per pipeline stage, workflow graph |
+| Agents | CodeAF | Coding harness that writes the video's brand theme |
+| Video | Hyperframes | HTML compositions rendered to MP4; also captures the official site's screenshots and design tokens |
+| Video | GSAP | Animation timeline inside the composition |
+| Video | FFmpeg, Chrome Headless Shell | Encoding and frame capture inside the Daytona sandbox |
+| Voice | Kokoro | Text-to-speech model, Japanese and English voices |
+| Voice | Kokoro-FastAPI | The server image that runs Kokoro on the Nosana GPU |
+| Voice | kokoro-onnx, misaki | Local CPU fallback and Japanese phonemizer |
+| Type | Noto Sans JP | Japanese font bundled with the composition |
+| App | FastAPI, Uvicorn, httpx | Web app, server-sent events, HTTP calls |
+| App | OpenAI Python SDK | Client for the OpenAI-compatible model endpoints (Nosana, Ollama Cloud) |
+| App | tavily-python, Daytona Python SDK, AgentField Python SDK | Partner SDKs |
+| App | uv, qrcode.js | Python environment; QR code on the brief |
+| Inspiration | /brag agent skill (latent-spaces/brag), LaunchCut | Project-to-launch-video as an agent task; LaunchLocal adds live market research, localization, a buyer review and sourced claims |
+
+Models: Kokoro for voice. Text generation uses Nosana hosted inference when its catalog lists a chat model, and otherwise DeepSeek V4.1 Flash on Ollama Cloud. CodeAF runs Kimi K2.7 Code on Ollama Cloud.
+
 ## Market packs
 
 A market is one JSON file in [`packs/`](packs). The repo has [`packs/ja-JP.json`](packs/ja-JP.json) and [`packs/en-US.json`](packs/en-US.json). To add a market, copy one to `packs/<id>.json` and edit:

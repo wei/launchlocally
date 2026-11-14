@@ -1,4 +1,4 @@
-"""Export finished runs as a static site (GitHub Pages): site/demo/<run_id>/ plus site/index.html.
+"""Export finished runs as a static site (GitHub Pages): site/demo/<run_id>/ plus site/demo/index.html.
 
 The exported page is the same run page, replaying the run's recorded events in the
 browser, so it shows the CACHED RUN badge. Usage:
@@ -80,12 +80,12 @@ def export(run_id: str) -> dict:
 
 def index(entries: list[dict]) -> None:
     cards = "\n".join(
-        f'<a class="card" href="demo/{html.escape(e["run_id"])}/"><b>{html.escape(e["product"])}</b>'
+        f'<a class="card" href="{html.escape(e["run_id"])}/"><b>{html.escape(e["product"])}</b>'
         f'<span>{html.escape(e["url"])} to {html.escape(e["market"])}</span><span>{e["facts"]} sourced facts</span></a>'
         for e in entries)
-    (SITE / "index.html").write_text(f"""<!doctype html>
+    (SITE / "demo" / "index.html").write_text(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LaunchLocal</title>
+<title>LaunchLocal recorded runs</title>
 <style>
 body{{margin:0;background:#0b0d10;color:#f2f4f7;font:18px/1.5 system-ui,-apple-system,"Noto Sans JP",sans-serif}}
 main{{max-width:960px;margin:0 auto;padding:56px 20px}}
@@ -96,14 +96,14 @@ h1{{font-size:48px;margin:0}}h1 i{{font-style:normal;color:#2ecc71}}p{{color:#aa
 .links a{{color:#2ecc71;margin-right:20px}}img{{width:100%;border-radius:12px;margin-top:28px}}
 .note{{font-size:15px}}
 </style></head><body><main>
-<h1>Launch<i>Local</i></h1>
+<h1>Launch<i>Local</i> recorded runs</h1>
 <p>Paste a URL. Launch like a local. Agents research a product and a target market, then write, voice and render a launch video in the local language and style, with an interactive brief where every claim opens its source.</p>
 <p class="note">These are recorded runs replayed in your browser, so each page shows a CACHED RUN badge. The live app runs the same pipeline on demand.</p>
 <div class="cards">
 {cards}
 </div>
-<p class="links"><a href="slides/">Slides</a><a href="{REPO}">GitHub repository</a></p>
-<img src="architecture.svg" alt="LaunchLocal architecture: AgentField runs research on Tavily, script and buyer gate on Nosana, voice on a Nosana GPU, CodeAF restyle, and render in a Daytona sandbox">
+<p class="links"><a href="../">LaunchLocal home</a><a href="../slides/">Slides</a><a href="{REPO}">GitHub repository</a></p>
+<img src="../architecture.svg" alt="LaunchLocal architecture: AgentField runs research on Tavily, script and buyer gate on Nosana, voice on a Nosana GPU, CodeAF restyle, and render in a Daytona sandbox">
 </main></body></html>
 """, encoding="utf-8")
 

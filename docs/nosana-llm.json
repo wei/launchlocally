@@ -1,0 +1,7 @@
+{"deployment_id": "BBptm8tbTmyovxqe8FNyjyjfKJSE6CiQmgXQ3LfmnRff",
+ "endpoint": "https://4t2Q9myjses4v5riEVBUPUJPwf2fpTqFEu2EgXzSqVmd.node.k8s.prd.nos.ci",
+ "model": "qwen2.5-14b",
+ "market_name": "NVIDIA 3090",
+ "usd_per_hour": 0.1745,
+ "api_key": null,
+ "created_at": "2026-11-14T07:05:05.022Z"}
