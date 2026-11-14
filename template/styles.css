@@ -50,7 +50,8 @@ main{flex:1;min-height:0;display:flex;align-items:center;gap:48px;padding:20px 0
 .scene-hook .headline{line-height:1.25}
 .scene-hook .claims{flex-direction:row;flex-wrap:wrap}
 .scene-hook .claim{background:transparent;border:0;border-left:4px solid var(--primary);border-radius:0;padding:4px 0 4px 18px}
-.scene-hook .claim-index{display:none}.scene-hook .claim-text{flex:none;font-size:30px}
+.scene-hook .claim-index{display:none}.scene-hook .claim-text{flex:0 1 auto;min-width:0;font-size:30px}
+.scene-hook .claim{max-width:100%;min-width:0}
 
 /* product: points beside the site in a browser window, or type only */
 .scene-product.has-visual .copy{flex:0 0 520px}

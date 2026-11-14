@@ -109,6 +109,49 @@ async def _fix_length(script, facts, brand, pack, rd):
     enforce(script, facts, brand, pack, rd)  # shortened text could carry a new number
 
 
+def _display_limits(pack: dict) -> tuple[int, int]:
+    """(headline, on-screen point) character limits; the video frame is fixed, so long text overflows it."""
+    return (28, 22) if pack["language"] in ("ja", "zh", "ko") else (56, 36)
+
+
+async def _fix_display(script, facts, brand, pack, rd):
+    """Shorten headlines and on-screen points that would not fit the frame. Numbers must still come from the cited fact."""
+    hl, pt = _display_limits(pack)
+    by_id = {f["id"]: f for f in facts}
+    todo = []
+    for sc in script["scenes"]:
+        if len(sc.get("headline_local", "")) > hl:
+            todo.append({"key": f"{sc['id']}.headline", "max": hl, "text": sc["headline_local"]})
+        for i, it in enumerate(sc.get("on_screen", [])):
+            if len(it.get("text_local", "")) > pt:
+                todo.append({"key": f"{sc['id']}.{i}", "max": pt, "text": it["text_local"]})
+    if not todo:
+        return
+    emit(rd, "strategist", "log", f"shortening {len(todo)} on-screen text(s) to fit the frame")
+    try:
+        out = await llm.chat_json(
+            f"You shorten {pack['language_name']} on-screen text for a video. Keep the meaning, keep numbers and product names exactly, "
+            "add no new numbers. Headlines stay a complete phrase; points become short noun phrases. Respect each item's max character count.",
+            json.dumps(todo, ensure_ascii=False) + '\nReturn [{"key": ..., "local": ..., "en": ...}].', 900)
+        fixed = {o["key"]: o for o in out if isinstance(o, dict) and o.get("key")}
+    except Exception as e:
+        emit(rd, "strategist", "log", f"shorten call failed ({e}); cutting")
+        fixed = {}
+    for sc in script["scenes"]:
+        cited = [by_id[i] for i in sc["fact_ids"] if i in by_id]
+        new = fixed.get(f"{sc['id']}.headline", {})
+        if new.get("local") and len(new["local"]) <= hl and _numbers_ok(new["local"], cited, brand):
+            sc["headline_local"], sc["headline_en"] = new["local"], new.get("en") or sc["headline_en"]
+        for i, it in enumerate(sc.get("on_screen", [])):
+            if len(it.get("text_local", "")) <= pt:
+                continue
+            new = fixed.get(f"{sc['id']}.{i}", {})
+            if new.get("local") and len(new["local"]) <= pt and _numbers_ok(new["local"], [by_id[it["fact_id"]]], brand):
+                it["text_local"], it["text_en"] = new["local"], new.get("en") or it["text_en"]
+            else:
+                it["text_local"] = it["text_local"][: pt - 1] + "…"  # shortcut: visible cut; the full claim is in the brief
+
+
 def _hard_cut(text: str, pack: dict) -> str:
     # shortcut: crude cut at the last clause mark, a real fix needs another model pass
     if pack["language"] != "ja":
@@ -154,6 +197,7 @@ Hard rules:
 - Every on-screen item and every scene cites fact ids from the facts list. Never invent a fact, customer, number or price.
 - A number or price may appear only if it is in the cited fact.
 - Each narration_local line is {_limit_text(pack)}.
+- The frame is small: headline_local is at most {_display_limits(pack)[0]} characters and each on_screen text_local at most {_display_limits(pack)[1]} characters.
 - Hook and proof scenes prefer facts with scope "market"; the product scene uses scope "product" facts.
 - "changes" explains what you changed versus how the product presents itself at home, and why, citing facts.
 - The buyer is: {pack['buyer_persona']['title_en']}. They care about: {'; '.join(pack['buyer_persona']['cares_about'])}."""
@@ -197,6 +241,7 @@ async def write_script(run_dir: Path, pack: dict) -> None:
     )
     script = _assemble(draft, pack, brand)
     await _fix_length(script, facts, brand, pack, rd)
+    await _fix_display(script, facts, brand, pack, rd)
     script["design_brief"] = brief
     write_json(rd / "script.json", script)
     for sc in script["scenes"]:
@@ -308,6 +353,7 @@ async def revise_script(run_dir: Path, pack: dict, round: dict) -> None:
     )
     script = _assemble(draft, pack, brand, old)
     await _fix_length(script, facts, brand, pack, rd)
+    await _fix_display(script, facts, brand, pack, rd)
     write_json(rd / "script.json", script)
     for sc in script["scenes"]:
         emit(rd, "strategist", "progress", sc["headline_local"], scene=sc["id"], role=sc["role"], headline_en=sc["headline_en"], fact_ids=sc["fact_ids"])

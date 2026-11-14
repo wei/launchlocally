@@ -252,9 +252,10 @@ Market style rules:
 Hard rules:
 - Read styles.css (its top comment lists the class names you may restyle) and index.html, then write theme.css.
 - Create or edit theme.css only. Do not change any other file.
-- CSS only: selectors that already exist in styles.css or index.html. Colors, backgrounds, borders, radii,
-  shadows, spacing, type sizes and weights. Never hide headlines, claims, source chips, captions or logos; do not change
-  positions in a way that makes text overlap or leave the 1280x720 frame.
+- Paint only: colors, backgrounds, gradients, borders, radii, shadows, font weights and letter spacing, on
+  selectors that already exist in styles.css or index.html. Layout is fixed: font sizes, padding, margins, widths,
+  display, position, flex and grid declarations are removed from your file afterwards, so do not spend effort on them.
+- Make it clearly look like the brand: backgrounds, card surfaces, chips, the call-to-action button, the progress line.
 - No @import, no url() pointing at the network, no new fonts. Use the CSS variables already defined in :root.
 - Keep text readable: strong contrast between text and its background on every scene.
 - Never run git, npm, npx or a browser. Aim to finish within 4 tool calls and end with a two-line summary.
@@ -276,6 +277,33 @@ def _theme_problem(css: str) -> str:
                 if last[0] not in _DECORATIVE:
                     return f"theme.css hides content ({sel.strip()[:60]})"
     return ""
+
+
+# A theme may change paint, never layout: sizes and positions are tuned to the 1280x720 frame.
+_PAINT = ("color", "background", "border", "box-shadow", "text-shadow", "letter-spacing", "font-weight", "font-style",
+          "outline", "text-decoration", "fill", "stroke", "accent-color", "caret-color", "--")
+_LAYOUT_BORDER = ("border-width", "border-top-width", "border-right-width", "border-bottom-width", "border-left-width")
+
+
+def sanitize_theme(css: str) -> tuple[str, int, int]:
+    """Keep paint declarations only. Returns (css, kept, dropped)."""
+    bare = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    bare = re.sub(r"@[^{};]+\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}", "", bare)  # drop @media/@keyframes/@font-face blocks whole
+    rules, kept, dropped = [], 0, 0
+    for selectors, body in re.findall(r"([^{}]+)\{([^{}]*)\}", bare):
+        decls = []
+        for d in body.split(";"):
+            prop = d.split(":", 1)[0].strip().lower()
+            if not prop or ":" not in d:
+                continue
+            if prop.startswith(_PAINT) and prop not in _LAYOUT_BORDER:
+                decls.append(d.strip())
+                kept += 1
+            else:
+                dropped += 1
+        if decls:
+            rules.append(f"{selectors.strip()}{{{';'.join(decls)}}}")
+    return "\n".join(rules) + "\n", kept, dropped
 
 
 def build_theme(run_dir: Path, pack: dict) -> dict:
@@ -313,11 +341,17 @@ def build_theme(run_dir: Path, pack: dict) -> dict:
     except Exception as e:
         problem = f"CodeAF failed: {e}"
     seconds = round(time.time() - t0, 1)
+    if not problem:
+        css, kept, dropped = sanitize_theme(css)
+        if kept < 5:
+            problem = "CodeAF's theme had no usable paint rules"
+        elif dropped:
+            common.emit(run_dir, "coder", "log", f"kept {kept} paint declarations from CodeAF's theme, dropped {dropped} that would change layout")
     if problem:
         common.emit(run_dir, "coder", "log", f"baseline look kept: {problem}"[:500], kept_baseline=True)
     else:
         (run_dir / "theme.css").write_text(css, encoding="utf-8")
-        common.emit(run_dir, "coder", "artifact", f"theme.css ({len(css.splitlines())} lines)", path="theme.css")
+        common.emit(run_dir, "coder", "artifact", f"theme.css ({len(css.splitlines())} rules)", path="theme.css")
     out = {"changed_files": [] if problem else ["theme.css"], "model": MODEL, "seconds": seconds, "kept_baseline": bool(problem)}
     common.emit(run_dir, "coder", "done", f"brand theme {'kept baseline' if problem else 'written'} in {seconds}s", **out)
     return out
