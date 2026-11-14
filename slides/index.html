@@ -142,13 +142,21 @@ b,.acc{color:var(--accent);font-weight:700}
 .stat .l{font-size:1.15em;font-weight:700;margin-top:.4em}
 .stat .jp{font-size:.95em;margin-top:.15em}
 
-@page{size:13.333in 7.5in;margin:0}
+.print-only{display:none}
+.s9 .print-only{flex-direction:column;align-items:center}
+.s9 .print-only img{display:block;height:400px;width:auto;border-radius:.5em}
+.s9 .print-only .watch{font-size:1.1em;margin-top:.4em;color:var(--accent)}
+
+@page{size:1280px 720px;margin:0}
 @media print{
   html,body{height:auto;background:var(--bg)}
-  .stage{position:static;transform:none;width:13.333in;height:auto;font-size:calc(13.333in / 64);overflow:visible}
-  .slide{position:relative;inset:auto;visibility:visible;width:13.333in;height:7.5in;
+  .stage{position:static;transform:none;width:1280px;height:auto;font-size:20px;overflow:visible}
+  .slide{position:relative;inset:auto;visibility:visible;width:1280px;height:720px;
     break-after:page;page-break-after:always;break-inside:avoid;overflow:hidden;background:var(--bg)}
   .slide:last-child{break-after:auto;page-break-after:auto}
+  .s9 video{display:none}
+  .s9 .print-only{display:flex}
+  .screen-only{display:none}
 }
 </style>
 </head>
@@ -292,6 +300,10 @@ b,.acc{color:var(--accent);font-weight:700}
   <p class="jp">自分たちのローンチ動画もLaunchLocallyで作りました</p>
   <div class="body">
     <video controls src="../launch.mp4" poster="../launch-poster.png"></video>
+    <div class="print-only">
+      <a href="https://wei.github.io/launchlocally/"><img src="../launch-poster.png" alt="LaunchLocally launch video"></a>
+      <a class="watch" href="https://wei.github.io/launchlocally/">Watch the video at https://wei.github.io/launchlocally/</a>
+    </div>
     <p class="lead">The team pointed LaunchLocally at its own website to make its own launch video.</p>
     <p class="jp">チームはLaunchLocallyに自社サイトのURLを渡し、自分たちのローンチ動画を作りました。</p>
   </div>
@@ -304,6 +316,7 @@ b,.acc{color:var(--accent);font-weight:700}
     <dl class="links">
       <dt>Repository<span>リポジトリ</span></dt><dd>github.com/wei/launchlocally</dd>
       <dt>Demo<span>デモ</span></dt><dd>wei.github.io/launchlocally</dd>
+      <dt class="screen-only">Slides<span>スライド</span></dt><dd class="screen-only"><a href="launchlocally-slides.pdf">PDF</a></dd>
     </dl>
     <div class="cols3">
       <div class="card stat"><div class="v">40+</div><p class="l">sourced facts per run</p><p class="jp">1回の実行で得る出典付きの事実</p></div>
