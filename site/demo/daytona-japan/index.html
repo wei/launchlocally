@@ -89,7 +89,8 @@ button{font:inherit;color:inherit}
 .persona b{display:block;font-size:19px;line-height:1.2}
 .persona span{font-size:13px;color:var(--muted)}
 .rounds{display:flex;gap:14px;flex:1;min-width:0}
-.round{flex:1;display:grid;grid-template-columns:auto 170px 1fr;gap:12px;align-items:center;min-width:0;animation:pop .4s ease-out}
+.round{flex:1;display:grid;grid-template-columns:auto 170px 1fr;gap:12px;align-items:center;min-width:0}
+.rounds .round:last-child{animation:pop .4s ease-out}
 .stamp{font-weight:900;font-size:20px;letter-spacing:.08em;padding:4px 10px;border:3px solid;border-radius:6px;transform:rotate(-7deg);text-align:center}
 .stamp small{display:block;font-size:11px;letter-spacing:.04em}
 .stamp.reject{color:var(--bad)}.stamp.approve{color:var(--good)}
@@ -336,10 +337,10 @@ function stageOf(e) {
   return -1;
 }
 function renderStages() {
-  $('#stages').innerHTML = STAGES.map((s, i) => {
+  setHtml('#stages', STAGES.map((s, i) => {
     const c = V.done ? 'done' : i < V.stage ? 'done' : i === V.stage ? (V.error ? 'error' : 'active') : '';
     return `<li class="${c}">${s}</li>`;
-  }).join('');
+  }).join(''));
   $('#cutLbl').textContent = V.cut > 1 ? `cut ${V.cut}, revised after the buyer's review` : '';
 }
 function laneEvent(e) {
@@ -382,10 +383,10 @@ function renderScenes() {
     html += `<div class="scene filled"><div class="hd">Scene ${i + 1}${(s || h).role ? ' · ' + esc((s || h).role) : ''}<span class="st">${esc(V.status[id] || 'scripted')}</span></div>
       <h3>${esc(head)}</h3>${s ? `<p>${esc(T(s, 'narration'))}</p>${lang === 'local' ? `<p class="en">${esc(s.narration_en)}</p>` : ''}` : ''}</div>`;
   }
-  $('#scenes').innerHTML = html;
+  setHtml('#scenes', html);
 }
 function renderLogs() {
-  const put = (id, arr, idle) => $(id).innerHTML = arr.length ? arr.map(l => `<div>${esc(l)}</div>`).join('') : `<div class="idle">${idle}</div>`;
+  const put = (id, arr, idle) => setHtml(id, arr.length ? arr.map(l => `<div>${esc(l)}</div>`).join('') : `<div class="idle">${idle}</div>`);
   put('#logRender', V.logs.render.slice(-7), 'waiting for the composition');
   put('#logVoice', V.logs.voice.slice(-3), 'waiting for the script');
   put('#logCoder', V.logs.coder.slice(-4), 'waiting for the baseline');
@@ -416,9 +417,15 @@ function personaHtml() {
   const p = (S.gate && S.gate.persona) || (S.pack && S.pack.buyer_persona) || {};
   return `<div class="persona"><div class="g">Buyer gate${p.gate_name ? ' · ' + esc(p.gate_name) : ''}</div><b>${esc(T(p, 'title') || 'Local buyer')}</b><span>${esc(lang === 'en' ? p.title_local : p.title_en)}</span></div>`;
 }
+// Panels are re-rendered on every event. Writing innerHTML recreates the nodes and restarts their entry
+// animations (the gate stamps flashed), so a panel is only rewritten when its markup actually changed.
+function setHtml(sel, html) {
+  const el = $(sel);
+  if (el.__html !== html) { el.__html = html; el.innerHTML = html; }
+}
 function renderGate() {
   const rs = rounds();
-  $('#gate').innerHTML = personaHtml() + `<div class="rounds">${rs.length ? rs.map(roundHtml).join('') : `<span class="gwait">${V.stage === 6 ? 'Reviewing the cut…' : 'The local buyer reviews each cut before it ships. Waiting for the first render.'}</span>`}</div>`;
+  setHtml('#gate', personaHtml() + `<div class="rounds">${rs.length ? rs.map(roundHtml).join('') : `<span class="gwait">${V.stage === 6 ? 'Reviewing the cut…' : 'The local buyer reviews each cut before it ships. Waiting for the first render.'}</span>`}</div>`);
 }
 
 function onEvent(e) {
@@ -508,8 +515,8 @@ function renderScene() {
   $('#caption').textContent = T(s, 'narration');
   const items = s.on_screen || [];
   if (!picked && items[0]) picked = items[0].fact_id;
-  $('#claims').innerHTML = items.map(o => `<button class="claim${o.fact_id === picked ? ' on' : ''}" data-f="${esc(o.fact_id)}">${esc(T(o, 'text'))}</button>`).join('');
-  $('#strip').innerHTML = scenes().map((x, i) => `<button class="${i === cur ? 'on' : ''}" data-i="${i}"><b>${i + 1} · ${esc(x.role || '')}</b><span>${esc(T(x, 'headline'))}</span></button>`).join('');
+  setHtml('#claims', items.map(o => `<button class="claim${o.fact_id === picked ? ' on' : ''}" data-f="${esc(o.fact_id)}">${esc(T(o, 'text'))}</button>`).join(''));
+  setHtml('#strip', scenes().map((x, i) => `<button class="${i === cur ? 'on' : ''}" data-i="${i}"><b>${i + 1} · ${esc(x.role || '')}</b><span>${esc(T(x, 'headline'))}</span></button>`).join(''));
   if (!hasVideo) $('#novideo').innerHTML = `<div class="note">Video not rendered for this run. Storyboard preview.</div>
     <h3>${esc(T(s, 'headline'))}</h3><ul>${items.map(o => `<li>${esc(T(o, 'text'))}</li>`).join('')}</ul>
     <button id="simBtn">${simPlay ? '❚❚ Pause' : '▶ Play storyboard'}</button>`;
@@ -545,10 +552,10 @@ function renderBrief() {
     return `<div class="fact" data-f="${esc(f.id)}">${u.length ? `<span class="used">in video</span>` : ''}${esc(T(f, 'claim'))}<a href="${href(f.url)}" target="_blank" rel="noopener">${esc(f.source_title || host(f.url))} · ${esc(host(f.url))} ↗</a></div>`;
   }).join('')}</div>`).join('') || '<p>No facts recorded.</p>';
 
-  $('#changes').innerHTML = ((S.script && S.script.changes) || []).map(c => `<div class="change"><b>${esc(T(c, 'what'))}</b><p>${esc(T(c, 'why'))}</p>${(c.fact_ids || []).map(i => `<button class="fid" data-f="${esc(i)}">${esc(i)}</button>`).join('')}</div>`).join('') || '<p>No changes recorded.</p>';
+  setHtml('#changes', ((S.script && S.script.changes) || []).map(c => `<div class="change"><b>${esc(T(c, 'what'))}</b><p>${esc(T(c, 'why'))}</p>${(c.fact_ids || []).map(i => `<button class="fid" data-f="${esc(i)}">${esc(i)}</button>`).join('')}</div>`).join('') || '<p>No changes recorded.</p>');
 
   const rs = (S.gate && S.gate.rounds) || [];
-  $('#hist').innerHTML = personaHtml().replace('class="persona"', 'class="persona" style="border:0;flex:none;margin-bottom:6px"') + (rs.map(roundHtml).join('') || '<p>No gate rounds recorded.</p>');
+  setHtml('#hist', personaHtml().replace('class="persona"', 'class="persona" style="border:0;flex:none;margin-bottom:6px"') + (rs.map(roundHtml).join('') || '<p>No gate rounds recorded.</p>'));
 
   const b = S.brand || {}, logo = b.logo || {};
   const src = logo.local ? `./${logo.local}` : logo.url;
