@@ -9,11 +9,11 @@ LaunchLocally
 
 ## Team Name & Member Names / チーム名とメンバー氏名
 
-TODO (team name, then each member's name)
+Filled in on the form. Not recorded in this public file.
 
 ## Member Emails / メールアドレス
 
-TODO
+Filled in on the form. Not recorded in this public file.
 
 ## GitHub Repo URL (public) / GitHubリポジトリのURL
 
