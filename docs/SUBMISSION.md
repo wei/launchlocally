@@ -28,6 +28,8 @@ https://wei.github.io/launchlocally/
 
 https://wei.github.io/launchlocally/slides/
 
+PDF with a text layer, if the form or a judge needs a file: https://wei.github.io/launchlocally/slides/launchlocally-slides.pdf
+
 ## Partner Technologies Used / 使用したパートナー技術
 
 AgentField + CodeAF, Tavily, Daytona, Nosana (all four, each at code level).

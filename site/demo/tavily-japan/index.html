@@ -99,6 +99,10 @@ button{font:inherit;color:inherit}
 .bar i{display:block;height:100%;border-radius:9px}
 .bars .v{font-family:var(--mono)}
 .reasons{margin:0;padding-left:16px;font-size:13px;line-height:1.3;min-width:0}
+/* the run view shows the first three reasons; the full list with gaps is in the brief's gate history */
+#gate{max-height:168px;overflow:hidden}
+#gate .reasons li:nth-child(n+4){display:none}
+#gate .reasons li{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gwait{color:var(--muted);align-self:center}
 
 /* brief */

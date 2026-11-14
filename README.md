@@ -18,7 +18,7 @@ LaunchLocally takes a product URL and a target market, and returns a launch vide
 [![Built with Daytona](https://img.shields.io/badge/built_with-Daytona-555.svg)](https://github.com/daytonaio)
 [![Built with Nosana](https://img.shields.io/badge/built_with-Nosana-555.svg)](https://github.com/nosana-ci)
 
-**[Live site](https://wei.github.io/launchlocally/)** · **[Recorded runs](https://wei.github.io/launchlocally/demo/)** · **[Slides](https://wei.github.io/launchlocally/slides/)** · **[Demo run-book](docs/DEMO.md)** · **[Submission answers](docs/SUBMISSION.md)**
+**[Live site](https://wei.github.io/launchlocally/)** · **[Recorded runs](https://wei.github.io/launchlocally/demo/)** · **[Slides](https://wei.github.io/launchlocally/slides/)** ([PDF](https://wei.github.io/launchlocally/slides/launchlocally-slides.pdf)) · **[Demo run-book](docs/DEMO.md)** · **[Submission answers](docs/SUBMISSION.md)**
 
 <a href="https://wei.github.io/launchlocally/"><img src="site/launch-poster.png" width="720" alt="Poster frame of the LaunchLocally launch video. Click to open the site and play it."></a>
 
@@ -37,6 +37,7 @@ LaunchLocally takes a product URL and a target market, and returns a launch vide
 ## Contents
 
 - [How it works](#how-it-works)
+- [Screenshots](#screenshots)
 - [Innovation](#innovation)
 - [Real-World Impact](#real-world-impact)
 - [Technical Execution](#technical-execution)
@@ -86,6 +87,23 @@ flowchart LR
   D --> OUT["Launch video and interactive brief"]
   G -->|"approve, or approve with gaps"| OUT
 ```
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/img/launcher.png" width="420" alt="Launcher"><br>The launcher: five sponsor buttons, any product URL, and past runs.</td>
+    <td align="center"><img src="docs/img/waiting-screen.png" width="420" alt="Live waiting screen"><br>The live waiting screen: 12 research agents on Tavily, the storyboard, and Daytona, Nosana and CodeAF logs.</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/img/buyer-gate.png" width="420" alt="Buyer gate"><br>The local buyer gate rejects cut 1 and approves cut 2.</td>
+    <td align="center"><img src="docs/img/brief.png" width="420" alt="Interactive brief"><br>The interactive brief: clicking a claim opens its source.</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/img/workflow-graph.png" width="420" alt="AgentField workflow graph"><br>The AgentField workflow graph, one node per stage.</td>
+    <td></td>
+  </tr>
+</table>
 
 ## Innovation
 
