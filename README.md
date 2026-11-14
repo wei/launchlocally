@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="site/logo.svg" width="96" alt="LaunchLocally logo">
+<img src="site/logo.svg" width="340" alt="LaunchLocally logo">
 
 # LaunchLocally
 
