@@ -76,37 +76,100 @@ def export(run_id: str) -> dict:
     page = page.replace("<script>", SHIM + "<script>", 1)
     (out / "index.html").write_text(page, encoding="utf-8")
     brand, inp = state.get("brand") or {}, state.get("input") or {}
-    return {"run_id": run_id, "product": brand.get("name", run_id), "url": inp.get("url", ""), "market": inp.get("market", ""),
-            "facts": len(state.get("facts") or [])}
+    rounds = (state.get("gate") or {}).get("rounds") or []
+    pack = state.get("pack") or {}
+    return {"run_id": run_id, "product": brand.get("name", run_id), "url": inp.get("url", ""), "market": pack.get("label") or inp.get("market", ""),
+            "facts": len(state.get("facts") or []), "cuts": len(rounds), "verdict": (rounds[-1]["verdict"] if rounds else "").replace("_", " "),
+            "poster": (out / "poster.png").exists()}
+
+
+DEMO_URL = "https://wei.github.io/launchlocally/demo/"
 
 
 def index(entries: list[dict]) -> None:
+    """Recorded-runs index, styled with the homepage stylesheet, with a QR code to this page."""
+    import segno  # pure-Python QR generator
+
+    demo = SITE / "demo"
+    demo.mkdir(parents=True, exist_ok=True)
+    segno.make(DEMO_URL, error="m").save(str(demo / "qr.svg"), scale=4, border=2, dark="#1c1a17", light="#fffcf5")
+    e_ = html.escape
     cards = "\n".join(
-        f'<a class="card" href="{html.escape(e["run_id"])}/"><b>{html.escape(e["product"])}</b>'
-        f'<span>{html.escape(e["url"])} to {html.escape(e["market"])}</span><span>{e["facts"]} sourced facts</span></a>'
+        f'''<a class="card top run" href="{e_(e["run_id"])}/">
+        {f'<img src="{e_(e["run_id"])}/poster.png" alt="First frame of the {e_(e["product"])} launch video" loading="lazy">' if e["poster"] else ""}
+        <h3>{e_(e["product"])}</h3>
+        <p>{e_(e["url"].replace("https://", "").rstrip("/"))} for {e_(e["market"])}</p>
+        <p class="meta">{e["facts"]} sourced facts · {e["cuts"]} cut{"" if e["cuts"] == 1 else "s"} · buyer gate: {e_(e["verdict"] or "not reviewed")}</p>
+      </a>'''
         for e in entries)
-    (SITE / "demo" / "index.html").write_text(f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LaunchLocally recorded runs</title>
+    (demo / "index.html").write_text(f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recorded runs: LaunchLocally</title>
+<meta name="description" content="Recorded LaunchLocally runs: launch videos and sourced briefs made from one product URL each.">
+<meta name="theme-color" content="#c5361d">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../styles.css">
 <style>
-body{{margin:0;background:#0b0d10;color:#f2f4f7;font:18px/1.5 system-ui,-apple-system,"Noto Sans JP",sans-serif}}
-main{{max-width:960px;margin:0 auto;padding:56px 20px}}
-h1{{font-size:48px;margin:0}}h1 i{{font-style:normal;color:#2ecc71}}p{{color:#aab2bd;max-width:60ch}}
-.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:28px 0}}
-.card{{display:flex;flex-direction:column;gap:4px;padding:20px;border:1px solid #2a2f37;border-radius:12px;background:#14171c;color:inherit;text-decoration:none}}
-.card:hover{{border-color:#2ecc71}}.card b{{font-size:24px}}.card span{{color:#aab2bd;font-size:15px}}
-.links a{{color:#2ecc71;margin-right:20px}}img{{width:100%;border-radius:12px;margin-top:28px}}
-.note{{font-size:15px}}
-</style></head><body><main>
-<h1>Launch<i>Locally</i> recorded runs</h1>
-<p>Paste a URL. Launch like a local. Agents research a product and a target market, then write, voice and render a launch video in the local language and style, with an interactive brief where every claim opens its source.</p>
-<p class="note">These are recorded runs replayed in your browser, so each page shows a CACHED RUN badge. The live app runs the same pipeline on demand.</p>
-<div class="cards">
+.runs-head {{ display: flex; gap: 32px; align-items: flex-start; justify-content: space-between; margin-bottom: 36px; }}
+.runs-head .lede {{ margin-bottom: 0; }}
+.qr {{ flex: none; text-align: center; font-size: 13px; color: var(--muted); }}
+.qr img {{ display: block; width: 132px; height: 132px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); margin-bottom: 6px; }}
+.runs {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }}
+.run {{ display: block; color: inherit; text-decoration: none; padding: 0 0 18px; overflow: hidden; }}
+.run:hover {{ border-color: var(--primary); }}
+.run img {{ display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid var(--line); margin-bottom: 16px; }}
+.run h3, .run p {{ margin: 0 22px; }}
+.run h3 {{ font-family: var(--serif); font-size: 1.5rem; }}
+.run p {{ margin-top: 4px; }}
+.run .meta {{ font-size: 14px; margin-top: 10px; }}
+@media (max-width: 640px) {{ .runs-head {{ flex-direction: column-reverse; }} }}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../"><img src="../logo.svg" alt="LaunchLocally logo" width="268" height="48"></a>
+    <nav aria-label="Main">
+      <a href="../#how">How it works</a>
+      <a href="./" aria-current="page">Recorded runs</a>
+      <a href="../docs/">Docs</a>
+      <a href="../pricing/">Pricing</a>
+      <a href="../slides/">Slides</a>
+      <a href="{REPO}">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="page">
+  <div class="wrap">
+    <div class="runs-head">
+      <div>
+        <p class="kicker">Recorded runs</p>
+        <h1>One URL in. A launch video and a sourced brief out.</h1>
+        <p class="lede">Each card is a real run of the pipeline, replayed in your browser: the research, the script, the local buyer's review, the video and every claim's source. Open one and press play.</p>
+      </div>
+      <div class="qr"><img src="qr.svg" alt="QR code for {DEMO_URL}">Scan to open this page</div>
+    </div>
+    <div class="runs">
 {cards}
-</div>
-<p class="links"><a href="../">LaunchLocally home</a><a href="../slides/">Slides</a><a href="{REPO}">GitHub repository</a></p>
-<img src="../architecture.svg" alt="LaunchLocally architecture: AgentField runs research on Tavily, script and buyer gate on Nosana, voice on a Nosana GPU, CodeAF restyle, and render in a Daytona sandbox">
-</main></body></html>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><a href="../">LaunchLocally</a> · <a href="../slides/">Slides</a> · <a href="{REPO}">GitHub repository</a> · Built at the Agent Forge AI Hackathon Tokyo, 14 November 2026.</p>
+  </div>
+</footer>
+
+</body>
+</html>
 """, encoding="utf-8")
 
 
