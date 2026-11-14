@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-labelledby="t d">
+<title id="t">LaunchLocal architecture</title>
+<desc id="d">A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research (Tavily and Nosana Qwen), script (Nosana Qwen), voice (Nosana GPU), compose (local code), code (CodeAF), render (Daytona) and buyer gate (Nosana Qwen). A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.</desc>
+<style>
+  text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:#eceae4;font-size:18px}
+  .h{font-size:20px;font-weight:700}
+  .dim{fill:#a4a8ae}
+  .pill{font-weight:700;fill:#14161a;text-anchor:middle}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#a4a8ae;text-anchor:end}
+  .box{fill:#22252b;stroke:#474c55;stroke-width:1.5}
+  .flow{stroke:#eceae4;stroke-width:2.5;fill:none}
+  .pack{stroke:#ffd166;stroke-width:2.5;fill:none;stroke-dasharray:7 6}
+  .rej{stroke:#ff7a59;stroke-width:2.5;fill:none}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#eceae4"/></marker>
+  <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ffd166"/></marker>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff7a59"/></marker>
+</defs>
+
+<rect width="1600" height="900" fill="#14161a"/>
+
+<!-- title -->
+<text x="20" y="58" style="font-size:40px;font-weight:800">LaunchLocal</text>
+<text x="20" y="96" class="dim" style="font-size:22px">Paste a URL. Launch like a local. Which partner technology does what.</text>
+<path class="pack" d="M1250 48H1310"/><text x="1324" y="54">market pack feeds a stage</text>
+<path class="rej" d="M1250 84H1310"/><text x="1324" y="90">rejected cut loops back</text>
+
+<!-- AgentField frame -->
+<rect x="188" y="128" width="1218" height="496" rx="14" fill="#1a1c22" stroke="#a78bfa" stroke-width="3"/>
+<rect x="204" y="142" width="134" height="30" rx="15" fill="#a78bfa"/><text x="271" y="163" class="pill">AgentField</text>
+<text x="352" y="163">control plane: runs every stage below as its own node and records the workflow graph</text>
+
+<!-- input -->
+<text x="20" y="156" class="h dim">Input</text>
+<rect class="box" x="20" y="170" width="150" height="126" rx="10" style="stroke:#ffd166"/>
+<text x="32" y="200" class="h">Market pack</text>
+<text x="32" y="228">ja-JP default</text>
+<text x="32" y="252">en-US reverse</text>
+<text x="32" y="276" class="dim">one JSON file</text>
+<rect class="box" x="20" y="355" width="150" height="90" rx="10"/>
+<text x="32" y="394" class="h">Product URL</text>
+<text x="32" y="420" class="dim">official site</text>
+<path class="flow" d="M170 400H204" marker-end="url(#a)"/>
+
+<!-- market pack bus -->
+<path class="pack" d="M170 226H1313"/>
+<path class="pack" d="M281 226V248" marker-end="url(#ap)"/>
+<path class="pack" d="M453 226V248" marker-end="url(#ap)"/>
+<path class="pack" d="M625 226V248" marker-end="url(#ap)"/>
+<path class="pack" d="M1313 226V248" marker-end="url(#ap)"/>
+<text x="969" y="214" text-anchor="middle" style="fill:#ffd166">language, voice, search sites, copy rules, buyer persona</text>
+
+<!-- stages -->
+<rect class="box" x="206" y="250" width="150" height="300" rx="10"/>
+<text x="216" y="282" class="h">Research</text>
+<rect x="214" y="294" width="134" height="28" rx="14" fill="#38bdf8"/><text x="281" y="314" class="pill">Tavily</text>
+<rect x="214" y="328" width="134" height="28" rx="14" fill="#34d399"/><text x="281" y="348" class="pill">Nosana Qwen</text>
+<text x="216" y="384">12 parallel</text>
+<text x="216" y="408">agents: 5 on</text>
+<text x="216" y="432">the official</text>
+<text x="216" y="456">site, 7 on the</text>
+<text x="216" y="480">target market.</text>
+<text x="216" y="504">Qwen extracts</text>
+<text x="216" y="528">sourced facts.</text>
+
+<rect class="box" x="378" y="250" width="150" height="300" rx="10"/>
+<text x="388" y="282" class="h">Script</text>
+<rect x="386" y="294" width="134" height="28" rx="14" fill="#34d399"/><text x="453" y="314" class="pill">Nosana Qwen</text>
+<text x="388" y="350">Four scenes</text>
+<text x="388" y="374">in the local</text>
+<text x="388" y="398">language.</text>
+<text x="388" y="422">Every line</text>
+<text x="388" y="446">cites a fact.</text>
+<text x="388" y="470">Also writes</text>
+<text x="388" y="494">the design</text>
+<text x="388" y="518">brief.</text>
+
+<rect class="box" x="550" y="250" width="150" height="300" rx="10"/>
+<text x="560" y="282" class="h">Voice</text>
+<rect x="558" y="294" width="134" height="28" rx="14" fill="#34d399"/><text x="625" y="314" class="pill">Nosana GPU</text>
+<text x="560" y="350">Kokoro voice</text>
+<text x="560" y="374">model on a</text>
+<text x="560" y="398">GPU</text>
+<text x="560" y="422">deployment</text>
+<text x="560" y="446">narrates</text>
+<text x="560" y="470">each scene.</text>
+
+<rect class="box" x="722" y="250" width="150" height="300" rx="10"/>
+<text x="732" y="282" class="h">Compose</text>
+<rect x="730" y="294" width="134" height="28" rx="14" fill="#9aa1ab"/><text x="797" y="314" class="pill">Local code</text>
+<text x="732" y="350">Builds the</text>
+<text x="732" y="374">baseline</text>
+<text x="732" y="398">Hyperframes</text>
+<text x="732" y="422">HTML video</text>
+<text x="732" y="446">from script,</text>
+<text x="732" y="470">brand and</text>
+<text x="732" y="494">audio.</text>
+
+<rect class="box" x="894" y="250" width="150" height="300" rx="10"/>
+<text x="904" y="282" class="h">Code</text>
+<rect x="902" y="294" width="134" height="28" rx="14" fill="#f472b6"/><text x="969" y="314" class="pill">CodeAF</text>
+<text x="904" y="350">Runs headless</text>
+<text x="904" y="374">on an Ollama</text>
+<text x="904" y="398">Cloud model.</text>
+<text x="904" y="422">Rewrites the</text>
+<text x="904" y="446">styling to</text>
+<text x="904" y="470">match the</text>
+<text x="904" y="494">brand.</text>
+
+<rect class="box" x="1066" y="250" width="150" height="300" rx="10"/>
+<text x="1076" y="282" class="h">Render</text>
+<rect x="1074" y="294" width="134" height="28" rx="14" fill="#fbbf24"/><text x="1141" y="314" class="pill">Daytona</text>
+<text x="1076" y="350">Sandbox with</text>
+<text x="1076" y="374">headless</text>
+<text x="1076" y="398">Chrome and</text>
+<text x="1076" y="422">FFmpeg</text>
+<text x="1076" y="446">renders the</text>
+<text x="1076" y="470">MP4 and</text>
+<text x="1076" y="494">serves it.</text>
+
+<rect class="box" x="1238" y="250" width="150" height="300" rx="10"/>
+<text x="1248" y="282" class="h">Buyer gate</text>
+<rect x="1246" y="294" width="134" height="28" rx="14" fill="#34d399"/><text x="1313" y="314" class="pill">Nosana Qwen</text>
+<text x="1248" y="350">Local buyer</text>
+<text x="1248" y="374">persona</text>
+<text x="1248" y="398">scores the</text>
+<text x="1248" y="422">cut, then</text>
+<text x="1248" y="446">approves or</text>
+<text x="1248" y="470">rejects it.</text>
+
+<!-- stage arrows -->
+<path class="flow" d="M356 400H376" marker-end="url(#a)"/>
+<path class="flow" d="M528 400H548" marker-end="url(#a)"/>
+<path class="flow" d="M700 400H720" marker-end="url(#a)"/>
+<path class="flow" d="M872 400H892" marker-end="url(#a)"/>
+<path class="flow" d="M1044 400H1064" marker-end="url(#a)"/>
+<path class="flow" d="M1216 400H1236" marker-end="url(#a)"/>
+<path class="flow" d="M1388 400H1422" marker-end="url(#a)"/>
+
+<!-- reject loop -->
+<path class="rej" d="M1313 550V580H453V552" marker-end="url(#ar)"/>
+<text x="883" y="608" text-anchor="middle" style="fill:#ff7a59">Rejected: cut 2. The script is revised and every later stage runs once more.</text>
+
+<!-- output -->
+<text x="1424" y="236" class="h dim">Output</text>
+<rect class="box" x="1424" y="250" width="160" height="300" rx="10" style="stroke:#eceae4"/>
+<text x="1436" y="286" class="h">Launch video</text>
+<text x="1436" y="314">Narrated MP4</text>
+<text x="1436" y="338">in the local</text>
+<text x="1436" y="362">language</text>
+<path d="M1436 400H1572" stroke="#474c55" stroke-width="1.5"/>
+<text x="1436" y="440" class="h">Interactive</text>
+<text x="1436" y="464" class="h">brief</text>
+<text x="1436" y="492">Every claim</text>
+<text x="1436" y="516">opens its</text>
+<text x="1436" y="540">source</text>
+
+<!-- legend -->
+<rect x="20" y="654" width="170" height="28" rx="14" fill="#a78bfa"/><text x="105" y="674" class="pill">AgentField</text>
+<text x="208" y="674">Control plane. Each pipeline stage is its own node in the workflow graph.</text>
+<text x="1580" y="674" class="mono">launchlocal/agents.py</text>
+
+<rect x="20" y="692" width="170" height="28" rx="14" fill="#38bdf8"/><text x="105" y="712" class="pill">Tavily</text>
+<text x="208" y="712">Map, extract and search for the 12 parallel research agents.</text>
+<text x="1580" y="712" class="mono">launchlocal/research.py</text>
+
+<rect x="20" y="730" width="170" height="28" rx="14" fill="#34d399"/><text x="105" y="750" class="pill">Nosana Qwen</text>
+<text x="208" y="750">Hosted inference: fact extraction, script, design brief, buyer gate.</text>
+<text x="1580" y="750" class="mono">llm.py, script.py, research.py</text>
+
+<rect x="20" y="768" width="170" height="28" rx="14" fill="#34d399"/><text x="105" y="788" class="pill">Nosana GPU</text>
+<text x="208" y="788">GPU deployment that runs the Kokoro voice model for narration.</text>
+<text x="1580" y="788" class="mono">launchlocal/voice.py</text>
+
+<rect x="20" y="806" width="170" height="28" rx="14" fill="#f472b6"/><text x="105" y="826" class="pill">CodeAF</text>
+<text x="208" y="826">Coding harness, headless on an Ollama Cloud model. Restyles the video to the brand.</text>
+<text x="1580" y="826" class="mono">launchlocal/coder.py</text>
+
+<rect x="20" y="844" width="170" height="28" rx="14" fill="#fbbf24"/><text x="105" y="864" class="pill">Daytona</text>
+<text x="208" y="864">Sandbox that renders the composition to MP4 and serves the result.</text>
+<text x="1580" y="864" class="mono">launchlocal/render.py</text>
+</svg>

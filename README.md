@@ -1,0 +1,142 @@
+# LaunchLocal
+
+Paste a URL. Launch like a local. LaunchLocal takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source.
+
+![LaunchLocal architecture. A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research with Tavily and Nosana hosted Qwen, script with Nosana hosted Qwen, voice on a Nosana GPU deployment, a locally built baseline composition, restyling with CodeAF, rendering in a Daytona sandbox, and a buyer gate on Nosana hosted Qwen. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.](site/architecture.svg)
+
+Demo: {{DEMO_URL}}
+Slides: {{SLIDES_URL}}
+
+## How it works
+
+1. **Input.** You paste a product URL and pick a market. Japan (`ja-JP`) is the default. The reverse pack (`en-US`) launches a Japanese product globally in English.
+2. **Research.** 12 agents run in parallel with Tavily: 5 read the official site (brand, product, pricing, customers, docs) and 7 search the target market using the areas and queries in the market pack. Nosana hosted Qwen turns the pages into facts. Each fact keeps its source URL.
+3. **Script.** Nosana hosted Qwen writes a four-scene script (hook, product, proof, call to action) in the local language, plus a design brief. A sentence stays only if it cites a `fact_id` that exists in `facts.json`.
+4. **Voice.** A Kokoro voice model on a Nosana GPU deployment narrates each scene.
+5. **Compose.** Local code builds a baseline Hyperframes HTML composition from the script, the brand profile and the audio.
+6. **Code.** CodeAF, run headless on an Ollama Cloud model, rewrites the composition's styling to match the brand and the design brief.
+7. **Render.** A Daytona sandbox renders the composition to MP4 with headless Chrome and FFmpeg, and serves the result.
+8. **Buyer gate.** A local buyer persona from the market pack scores the cut and approves or rejects it. On reject, the script is revised and voice, compose, code, render and the gate run once more as cut 2.
+9. **Output.** The launch video and an interactive brief. Clicking a claim opens its source.
+
+AgentField runs steps 2 to 8. Each stage is its own node in the workflow graph.
+
+```mermaid
+flowchart LR
+  URL[Product URL] --> R
+  PACK[Market pack JSON] -.-> R
+  PACK -.-> S
+  PACK -.-> V
+  PACK -.-> G
+  subgraph AF[AgentField control plane: one node per stage]
+    R[Research: 12 agents<br/>Tavily + Nosana Qwen] --> S[Script<br/>Nosana Qwen]
+    S --> V[Voice<br/>Nosana GPU, Kokoro]
+    V --> C[Compose<br/>local code, Hyperframes]
+    C --> K[Code<br/>CodeAF on Ollama Cloud]
+    K --> D[Render<br/>Daytona sandbox]
+    D --> G{Buyer gate<br/>Nosana Qwen}
+    G -- reject: cut 2 --> S
+  end
+  G -- approve --> OUT[Launch video + interactive brief]
+```
+
+## Innovation
+
+- The video is reviewed by an agent that plays the local buyer, not by the author. For Japan the persona is the head of IT at a large enterprise. It scores four questions from the market pack and rejects the cut if any score is below 0.7 (`buyer_gate` in [`launchlocal/script.py`](launchlocal/script.py)).
+- A rejection changes the product. The gate's reasons go to `revise_script`, and the pipeline produces cut 2 (`_flow` in [`launchlocal/agents.py`](launchlocal/agents.py)).
+- A coding agent styles the video. CodeAF edits the composition's files, and the result is kept only if the text and the `data-scene` / `data-fact-id` attributes are unchanged (`fingerprint` in [`launchlocal/coder.py`](launchlocal/coder.py)).
+
+## Real-World Impact
+
+- The input is one URL. No brand guide, script or footage is needed. The brand colors, logo and images are read from the official site (`run_research` in [`launchlocal/research.py`](launchlocal/research.py)).
+- Every sentence in the video carries a `fact_id` from `facts.json`. Unsourced sentences are dropped, and numbers must appear in the cited source (`enforce` and `_numbers_ok` in [`launchlocal/script.py`](launchlocal/script.py)).
+- The brief lets a reviewer check each claim against its source before the video is used. A measured run produced {{FACTS}} sourced facts and took {{SECONDS}} seconds from URL to video.
+
+## Technical Execution
+
+- Stages communicate only through files in `runs/<run_id>/` with the shapes in [`docs/CONTRACT.md`](docs/CONTRACT.md). Each stage can be run alone from the command line against a run directory.
+- Every stage appends to `events.jsonl`. The waiting screen is a live view of that stream over server-sent events (`events` in [`launchlocal/server.py`](launchlocal/server.py)).
+- Each external dependency has a named fallback that logs when it is used. See "What is live and what is a fallback".
+
+## Partner Tech Usage
+
+| Partner | Job | Why the product breaks without it | Where in the code |
+|---------|-----|-----------------------------------|-------------------|
+| AgentField | Control plane. Runs each pipeline stage as its own node and shows the workflow graph. | No record of which agent did what, and no graph of the two passes. | [`launchlocal/agents.py`](launchlocal/agents.py): `build_app` registers one reasoner per stage; `launch_flow` calls each with `app.call`; `launch` posts to the control plane's execute endpoint. |
+| CodeAF | Coding harness. Runs headless on an Ollama Cloud model and rewrites the composition's styling to match the brand. | The video keeps the baseline look and does not match the official site. | [`launchlocal/coder.py`](launchlocal/coder.py): `_run_codeaf` runs `codeaf exec`; `restyle_composition` checks and keeps or restores the result. |
+| Tavily | Map, extract and search for 12 parallel research agents: 5 on the official site, 7 on the target market. | No sourced facts, so the script has nothing it is allowed to say. | [`launchlocal/research.py`](launchlocal/research.py): `run_research` and its inner `call`, which invokes `map`, `extract` and `search` on `AsyncTavilyClient`. |
+| Nosana (hosted inference) | Qwen extracts facts, writes the script and the design brief, and plays the buyer gate. | No facts, no script and no review. | [`launchlocal/llm.py`](launchlocal/llm.py): `chat`, `chat_json`. [`launchlocal/script.py`](launchlocal/script.py): `write_script`, `_design_brief`, `buyer_gate`, `revise_script`. [`launchlocal/research.py`](launchlocal/research.py): `_Model.ask`. |
+| Nosana (GPU deployment) | Runs the Kokoro voice model that narrates each scene. | The video has no narration. | [`launchlocal/voice.py`](launchlocal/voice.py): `_post` sends `POST /v1/audio/speech` to the deployment; `synthesize` and `voice_scenes` use it. Deployment: [`docs/nosana-voice.md`](docs/nosana-voice.md). |
+| Daytona | Sandbox that renders the Hyperframes HTML composition to MP4 with headless Chrome and FFmpeg, and serves the result. | Nowhere isolated to run agent-written code, and no hosted video. | [`launchlocal/render.py`](launchlocal/render.py): `_sandbox` creates or reuses the sandbox; `_remote` runs the render commands; `render` uploads, renders and downloads. Setup: [`docs/daytona-render.md`](docs/daytona-render.md). |
+
+## Market packs
+
+A market is one JSON file in [`packs/`](packs). The repo has [`packs/ja-JP.json`](packs/ja-JP.json) and [`packs/en-US.json`](packs/en-US.json). To add a market, copy one to `packs/<id>.json` and edit:
+
+- `language`, `language_name`, `country`, `currency`
+- `voice`: the Kokoro voice and language code
+- `search`: country and local sites
+- `research_areas`: the market research agents and their query templates
+- `copy_rules`, `style_rules`, `cta_examples`: how the script and the video should read and look
+- `buyer_persona`: who reviews the cut, what they care about, and the questions they score
+
+The server lists every file in `packs/` (`GET /api/packs`), so the new market appears in the picker without code changes.
+
+## Run it
+
+Python 3.12 with uv. Put `TAVILY_API_KEY`, `DAYTONA_API_KEY`, `NOSANA_API_KEY` and `OLLAMA_API_KEY` in `.env` at the project root.
+
+```sh
+export PATH="$HOME/.agentfield/bin:$HOME/.codeaf/bin:$PATH"
+
+# 1. AgentField control plane, port 8080
+af server --open=false
+
+# 2. LaunchLocal agent node, port 8001
+.venv/bin/python -m launchlocal.agents
+
+# 3. Web app, port 8787
+.venv/bin/python -m launchlocal.server
+```
+
+Open http://127.0.0.1:8787, paste a URL and pick a market. The workflow graph is at http://localhost:8080/ui/ under Workflows.
+
+Start a run without the web app:
+
+```sh
+curl -s -X POST http://localhost:8080/api/v1/execute/async/launchlocal.launch \
+  -H 'Content-Type: application/json' \
+  -d '{"input": {"url": "https://www.daytona.io", "market": "ja-JP", "run_id": "demo-1"}}'
+```
+
+Run single stages against a run directory:
+
+```sh
+.venv/bin/python -m launchlocal.voice <run_id> [market]
+.venv/bin/python -m launchlocal.compose <run_id>
+.venv/bin/python -m launchlocal.coder <run_id> [market]
+.venv/bin/python -m launchlocal.render <run_id>
+```
+
+Install notes for AgentField and CodeAF are in [`docs/agentfield-codeaf.md`](docs/agentfield-codeaf.md).
+
+## What is live and what is a fallback
+
+Live path: Tavily, Nosana hosted inference, the Nosana GPU voice deployment, CodeAF, Daytona and AgentField are all called during a run. Each fallback below writes a `log` event to `events.jsonl` when it is used.
+
+| Fallback | When it is used | What happens |
+|----------|-----------------|--------------|
+| Local voice | The Nosana voice endpoint fails | `voice.py` runs the same Kokoro model on the local CPU and logs `fallback: true`. |
+| Local render | `LAUNCHLOCAL_RENDER=local` is set | `render.py` renders with the same pinned Hyperframes CLI on the local machine. `render.json` has `preview_url: null` and `sandbox_id: null`. It is never chosen silently. |
+| Baseline composition | CodeAF fails, changes text or fact attributes, or the result fails lint | `coder.py` restores the baseline composition and logs `baseline kept: <reason>`. The run continues. |
+| Pipeline without AgentField | The control plane or the agent node is unreachable | `launch` in `agents.py` runs the same stages in process with `run_pipeline` and logs it. |
+| Cached-run replay | A recorded run is opened with `?replay=1` | The server replays the recorded `events.jsonl`. The page shows a "CACHED RUN" badge. |
+
+## Limits
+
+- The source check confirms that each sentence cites an existing fact and that its numbers appear in the source. It does not check that the source fully supports the wording.
+- The buyer gate allows one revision. Cut 2 is final whether or not it is approved.
+- The video has four scenes. Two market packs exist: `ja-JP` and `en-US`.
+- The Nosana voice deployment has a job timeout and must be recreated after it ends. The Daytona sandbox is kept warm and stays billable until stopped.
+- The Daytona preview URL shows a Daytona warning page in phone browsers. The MP4 is also downloaded to the run directory and served by the web app.
+- The AgentField control plane runs locally in this build.
