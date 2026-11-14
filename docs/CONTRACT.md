@@ -1,4 +1,4 @@
-# LaunchLocal build contract
+# LaunchLocally build contract
 
 Paste a product URL, pick a target market. Agents research the product and the
 market, then write, voice and render a launch video in the local language and

@@ -25,7 +25,7 @@ Stop everything afterwards: `scripts/start.sh --stop`.
 
 | Time | Do | Say |
 |------|----|-----|
-| 0:00 | Launcher on screen | "A company entering Japan translates its launch material. Local buyers expect local proof, local tone and a local format. LaunchLocal does that from one URL." |
+| 0:00 | Launcher on screen | "A company entering Japan translates its launch material. Local buyers expect local proof, local tone and a local format. LaunchLocally does that from one URL." |
 | 0:10 | Ask a sponsor judge to pick: Daytona, Tavily, Nosana or AgentField. Click that button. Market stays Japan. | "Pick your own product. We will launch it in Japan, in Japanese, right now." |
 | 0:20 | Research column fills | "Twelve agents are searching with **Tavily**: five read the official site, seven search the Japanese web for competitors, pricing, trust requirements and how local buyers talk. Every fact keeps its source." |
 | 0:40 | Storyboard cards fill; infrastructure column | "A strategist writes the script. **CodeAF** is writing the theme so the video looks like the official site. The voice is generated on a **Nosana** GPU." |

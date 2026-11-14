@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LaunchLocal run</title>
+<title>LaunchLocally run</title>
 <style>
 :root{--bg:#0b0d10;--panel:#14181d;--panel2:#1b2027;--line:#2a313a;--text:#f3f5f7;--muted:#9aa4b0;--accent:#ffd23f;--accent2:#6aa8ff;--on:#111;--good:#4fd983;--bad:#ff6b60;--warn:#ffb84d;--mono:ui-monospace,"SF Mono",Menlo,monospace}
 *{box-sizing:border-box}
@@ -180,7 +180,7 @@ button{font:inherit;color:inherit}
 </head>
 <body>
 <header class="top">
-  <a class="logo" href="/" title="Paste a URL. Launch like a local.">Launch<span>Local</span></a>
+  <a class="logo" href="/" title="Paste a URL. Launch like a local.">Launch<span>Locally</span></a>
   <div class="runinfo"><span id="product">…</span><i>→</i><span id="market"></span></div>
   <span id="cached" class="badge cached" hidden title="Replay of a recorded run, not live">CACHED RUN</span>
   <span id="live" class="badge live" hidden>LIVE</span>
@@ -289,7 +289,7 @@ function renderHead() {
   const name = (S.brand && S.brand.name) || (S.script && S.script.product) || host((S.input || {}).url) || runId;
   $('#product').textContent = name;
   $('#market').textContent = (S.pack && S.pack.label) || (S.input || {}).market || '';
-  document.title = `${name} · LaunchLocal`;
+  document.title = `${name} · LaunchLocally`;
   $('#langSeg [data-l=local]').textContent = ((S.pack && S.pack.language) || ((S.input || {}).market || 'local').slice(0, 2)).toUpperCase();
 }
 function fmt(s) { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }

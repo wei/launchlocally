@@ -1,4 +1,4 @@
-# AgentField and CodeAF in LaunchLocal
+# AgentField and CodeAF in LaunchLocally
 
 AgentField orchestrates the pipeline (`launchlocal/agents.py`). CodeAF restyles
 the video composition (`launchlocal/coder.py`).
@@ -52,7 +52,7 @@ curl -s -X POST http://localhost:8080/api/v1/execute/async/launchlocal.launch \
 
 `/api/v1/execute/launchlocal.launch` (no `async`) blocks until the run ends.
 From Python, `await launchlocal.agents.launch(url, market, run_id)` posts to the
-async endpoint and returns the LaunchLocal run id at once. The AgentField
+async endpoint and returns the LaunchLocally run id at once. The AgentField
 execution and workflow ids land in `events.jsonl` as a `system` `log` event.
 
 ## Reasoners

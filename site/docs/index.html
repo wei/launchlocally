@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Docs: LaunchLocal</title>
-<meta name="description" content="How a LaunchLocal run works, the files in a run directory, how to add a market pack and how to run it yourself.">
+<title>Docs: LaunchLocally</title>
+<meta name="description" content="How a LaunchLocally run works, the files in a run directory, how to add a market pack and how to run it yourself.">
 <meta name="theme-color" content="#c5361d">
 <meta property="og:image" content="../img/waiting-screen.png">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
@@ -13,14 +13,14 @@
 <body>
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="../"><img src="../logo.svg" alt="LaunchLocal logo" width="268" height="48"></a>
+    <a class="brand" href="../"><img src="../logo.svg" alt="LaunchLocally logo" width="268" height="48"></a>
     <nav aria-label="Main">
       <a href="../">Home</a>
       <a href="../demo/">Recorded runs</a>
       <a href="./" aria-current="page">Docs</a>
       <a href="../pricing/">Pricing</a>
       <a href="../slides/">Slides</a>
-      <a href="https://github.com/wei/launchlocal">GitHub</a>
+      <a href="https://github.com/wei/launchlocally">GitHub</a>
     </nav>
   </div>
 </header>
@@ -28,8 +28,8 @@
 <main class="page">
   <div class="wrap">
     <p class="kicker">DOCUMENTATION</p>
-    <h1>How LaunchLocal works</h1>
-    <p class="lede">LaunchLocal takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source. The full reference is the <a href="https://github.com/wei/launchlocal">README in the repository</a>.</p>
+    <h1>How LaunchLocally works</h1>
+    <p class="lede">LaunchLocally takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source. The full reference is the <a href="https://github.com/wei/launchlocally">README in the repository</a>.</p>
 
     <h2 id="run">How a run works</h2>
     <ol>
@@ -84,7 +84,7 @@
 # 1. AgentField control plane, port 8080
 af server --open=false
 
-# 2. LaunchLocal agent node, port 8001
+# 2. LaunchLocally agent node, port 8001
 .venv/bin/python -m launchlocal.agents
 
 # 3. Web app, port 8787
@@ -115,9 +115,9 @@ af server --open=false
       <a href="../demo/">Recorded runs</a>
       <a href="../pricing/">Pricing</a>
       <a href="../slides/">Slides</a>
-      <a href="https://github.com/wei/launchlocal">GitHub</a>
+      <a href="https://github.com/wei/launchlocally">GitHub</a>
     </nav>
-    <span>LaunchLocal. Agent Forge AI Hackathon Tokyo, 14 November 2026.</span>
+    <span>LaunchLocally. Agent Forge AI Hackathon Tokyo, 14 November 2026.</span>
   </div>
 </footer>
 </body>

@@ -143,7 +143,7 @@ def render(run_dir: Path, cut: int = 1) -> dict:
             _remote(run_dir,sandbox,f'ffmpeg -hide_banner -loglevel error -y -ss 1 -i {q(remote)}/video.mp4 -frames:v 1 -update 1 {q(remote)}/poster.png')
             for name in ['video.mp4','poster.png']:
                 sandbox.fs.download_file(remote + '/' + name,str(run_dir / name))
-            index = '<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><title>LaunchLocal</title><body style="margin:0;background:#0a0a0a;color:white;font-family:sans-serif"><video controls playsinline poster="poster.png" src="video.mp4" style="width:100%;max-height:95vh"></video></body></html>'
+            index = '<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><title>LaunchLocally</title><body style="margin:0;background:#0a0a0a;color:white;font-family:sans-serif"><video controls playsinline poster="poster.png" src="video.mp4" style="width:100%;max-height:95vh"></video></body></html>'
             sandbox.fs.upload_file(index.encode(), remote + '/index.html')
             # One persistent static server, serving each run by directory name.
             sandbox.fs.upload_file(str(common.ROOT / 'template' / 'serve.py'), '/home/daytona/launchlocal/serve.py')

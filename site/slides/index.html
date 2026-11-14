@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LaunchLocal</title>
+<title>LaunchLocally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@ html,body{height:100%;background:#000;color:var(--text);
 .slide.on{visibility:visible}
 .slide::after{content:attr(data-n) " / 10";position:absolute;right:2em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-variant-numeric:tabular-nums}
-.slide::before{content:"LaunchLocal";position:absolute;left:4em;bottom:1.1em;
+.slide::before{content:"LaunchLocally";position:absolute;left:4em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-weight:700;letter-spacing:.02em}
 .slide[data-n="1"]::before{content:none}
 
@@ -163,13 +163,13 @@ tr:last-child td{border-bottom:0}
 <main class="stage" id="stage">
 
 <section class="slide title on" data-n="1">
-  <h1>Launch<span>Local</span></h1>
+  <h1>Launch<span>Locally</span></h1>
   <p class="tag">Paste a URL. Launch like a local.</p>
   <p class="tagjp">URLを貼り付けるだけで、現地に合ったローンチ動画を作ります。</p>
   <div class="meta">
     <div>Agent Forge AI Hackathon Tokyo
       <small>14 November 2026 · Plug and Play Japan, Shibuya<br>2026年11月14日 · Plug and Play Japan(渋谷)</small></div>
-    <div class="team"><small>Team / チーム</small><strong>Team LaunchLocal</strong></div>
+    <div class="team"><small>Team / チーム</small><strong>Team LaunchLocally</strong></div>
   </div>
 </section>
 
@@ -193,7 +193,7 @@ tr:last-child td{border-bottom:0}
 
 <section class="slide s3" data-n="3">
   <h2>What it does</h2>
-  <p class="jp">LaunchLocalの処理の流れ</p>
+  <p class="jp">LaunchLocallyの処理の流れ</p>
   <div class="body">
     <div class="flow">
       <div class="step"><div class="n">1</div><h3>URL and market</h3>
@@ -232,7 +232,7 @@ tr:last-child td{border-bottom:0}
     <span class="pill" style="background:#34d399">Nosana</span>
     <span class="pill" style="background:#fbbf24">Daytona</span>
   </div>
-  <img src="../architecture.svg" alt="LaunchLocal architecture: a product URL and a market pack enter the AgentField control plane, which runs research (Tavily, Nosana Qwen), script (Nosana Qwen), voice (Nosana GPU), compose, code (CodeAF), render (Daytona) and the buyer gate (Nosana Qwen). A rejected cut loops back to the script as cut 2. Output: launch video and interactive brief.">
+  <img src="../architecture.svg" alt="LaunchLocally architecture: a product URL and a market pack enter the AgentField control plane, which runs research (Tavily, Nosana Qwen), script (Nosana Qwen), voice (Nosana GPU), compose, code (CodeAF), render (Daytona) and the buyer gate (Nosana Qwen). A rejected cut loops back to the script as cut 2. Output: launch video and interactive brief.">
 </section>
 
 <section class="slide s4b" data-n="5">
@@ -329,11 +329,11 @@ tr:last-child td{border-bottom:0}
 
 <section class="slide s9" data-n="9">
   <h2>We launched ourselves with it</h2>
-  <p class="jp">自分たちのローンチ動画もLaunchLocalで作りました</p>
+  <p class="jp">自分たちのローンチ動画もLaunchLocallyで作りました</p>
   <div class="body">
     <video controls src="../launch.mp4" poster="../launch-poster.png"></video>
-    <p class="lead">The team pointed LaunchLocal at its own website to make its own launch video.</p>
-    <p class="jp">チームはLaunchLocalに自社サイトのURLを渡し、自分たちのローンチ動画を作りました。</p>
+    <p class="lead">The team pointed LaunchLocally at its own website to make its own launch video.</p>
+    <p class="jp">チームはLaunchLocallyに自社サイトのURLを渡し、自分たちのローンチ動画を作りました。</p>
   </div>
 </section>
 
@@ -342,8 +342,8 @@ tr:last-child td{border-bottom:0}
   <p class="jp">リンクと数値</p>
   <div class="body">
     <dl class="links">
-      <dt>Repository<span>リポジトリ</span></dt><dd>github.com/wei/launchlocal</dd>
-      <dt>Demo<span>デモ</span></dt><dd>wei.github.io/launchlocal</dd>
+      <dt>Repository<span>リポジトリ</span></dt><dd>github.com/wei/launchlocally</dd>
+      <dt>Demo<span>デモ</span></dt><dd>wei.github.io/launchlocally</dd>
     </dl>
     <div class="cols3">
       <div class="card stat"><div class="v">40+</div><p class="l">sourced facts per run</p><p class="jp">1回の実行で得る出典付きの事実</p></div>

@@ -1,11 +1,11 @@
-# LaunchLocal
+# LaunchLocally
 
-Paste a URL. Launch like a local. LaunchLocal takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source.
+Paste a URL. Launch like a local. LaunchLocally takes a product URL and a target market, and returns a launch video in the local language plus an interactive brief where every claim opens its source.
 
-![LaunchLocal architecture. A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research with Tavily and Nosana hosted Qwen, script with Nosana hosted Qwen, voice on a Nosana GPU deployment, a locally built baseline composition, restyling with CodeAF, rendering in a Daytona sandbox, and a buyer gate on Nosana hosted Qwen. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.](site/architecture.svg)
+![LaunchLocally architecture. A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research with Tavily and Nosana hosted Qwen, script with Nosana hosted Qwen, voice on a Nosana GPU deployment, a locally built baseline composition, restyling with CodeAF, rendering in a Daytona sandbox, and a buyer gate on Nosana hosted Qwen. A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.](site/architecture.svg)
 
-- Demo (recorded runs replayed in the browser, labelled as cached): https://wei.github.io/launchlocal/
-- Slides: https://wei.github.io/launchlocal/slides/
+- Demo (recorded runs replayed in the browser, labelled as cached): https://wei.github.io/launchlocally/
+- Slides: https://wei.github.io/launchlocally/slides/
 - Submission answers: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
 
 ## How it works
@@ -89,7 +89,7 @@ flowchart LR
 | App | OpenAI Python SDK | Client for the OpenAI-compatible model endpoints (Nosana, Ollama Cloud) |
 | App | tavily-python, Daytona Python SDK, AgentField Python SDK | Partner SDKs |
 | App | uv, qrcode.js | Python environment; QR code on the brief |
-| Inspiration | /brag agent skill (latent-spaces/brag), LaunchCut | Project-to-launch-video as an agent task; LaunchLocal adds live market research, localization, a buyer review and sourced claims |
+| Inspiration | /brag agent skill (latent-spaces/brag), LaunchCut | Project-to-launch-video as an agent task; LaunchLocally adds live market research, localization, a buyer review and sourced claims |
 
 Models: Kokoro for voice. Text generation uses Nosana hosted inference when its catalog lists a chat model, and otherwise DeepSeek V4.1 Flash on Ollama Cloud. CodeAF runs Kimi K2.7 Code on Ollama Cloud.
 
@@ -116,7 +116,7 @@ export PATH="$HOME/.agentfield/bin:$HOME/.codeaf/bin:$PATH"
 # 1. AgentField control plane, port 8080
 af server --open=false
 
-# 2. LaunchLocal agent node, port 8001
+# 2. LaunchLocally agent node, port 8001
 .venv/bin/python -m launchlocal.agents
 
 # 3. Web app, port 8787

@@ -209,7 +209,7 @@ def build_app():
 
     common.load_env()
     app = Agent(node_id=NODE, agentfield_server=SERVER, version="0.1.0",
-                description="LaunchLocal: localized launch video pipeline")
+                description="LaunchLocally: localized launch video pipeline")
 
     def register(stage: str):
         async def reasoner(run_id: str, market: str = "ja-JP", cut: int = 1) -> dict:
@@ -224,10 +224,10 @@ def build_app():
     for stage in STAGES:
         register(stage)
 
-    @app.reasoner(name="launch", description="Run the whole LaunchLocal flow for one product URL and market")
+    @app.reasoner(name="launch", description="Run the whole LaunchLocally flow for one product URL and market")
     async def launch_flow(url: str, market: str = "ja-JP", run_id: str | None = None) -> dict:
         run_id = _init_run(url, market, run_id)
-        app.note(f"LaunchLocal run {run_id}: {url} -> {market}", tags=["launch", run_id])
+        app.note(f"LaunchLocally run {run_id}: {url} -> {market}", tags=["launch", run_id])
 
         async def step(stage: str, cut: int) -> dict:
             # app.call goes through the control plane, so each stage is its own node in the workflow graph

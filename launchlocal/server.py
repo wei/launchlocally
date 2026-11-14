@@ -1,4 +1,4 @@
-"""LaunchLocal controller API and web pages.
+"""LaunchLocally controller API and web pages.
 
 Run from the project root:  .venv/bin/python -m launchlocal.server   (port 8787)
 Env: HOST (default 127.0.0.1), PORT (8787), PUBLIC_BASE_URL (base for the QR code).
@@ -23,7 +23,7 @@ WEB = ROOT / "web"
 STATE_FILES = ("input", "brand", "facts", "script", "gate", "render")
 RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
-app = FastAPI(title="LaunchLocal")
+app = FastAPI(title="LaunchLocally")
 RUNS.mkdir(exist_ok=True)
 
 

@@ -6,7 +6,7 @@ TODO are for the team to fill in or for the lead to confirm before submitting.
 
 ## Project Name / プロジェクト名
 
-LaunchLocal
+LaunchLocally
 
 ## Team Name & Member Names / チーム名とメンバー氏名
 
@@ -18,15 +18,15 @@ TODO
 
 ## GitHub Repo URL (public) / GitHubリポジトリのURL
 
-https://github.com/wei/launchlocal
+https://github.com/wei/launchlocally
 
 ## Live Demo / Deployment URL / デモ・デプロイURL
 
-TODO confirm once GitHub Pages is live: https://wei.github.io/launchlocal/
+TODO confirm once GitHub Pages is live: https://wei.github.io/launchlocally/
 
 ## Slide Deck URL / スライドURL
 
-TODO confirm once GitHub Pages is live: https://wei.github.io/launchlocal/slides/
+TODO confirm once GitHub Pages is live: https://wei.github.io/launchlocally/slides/
 
 ## Partner Technologies Used / 使用したパートナー技術
 
@@ -39,7 +39,7 @@ AgentField + CodeAF, Tavily, Daytona, Nosana (all four, each at code level).
 
 ## What does your agent do? (2-3 sentences) / エージェントの概要(2-3文)
 
-LaunchLocal takes a product URL and a target market (Japan by default) and
+LaunchLocally takes a product URL and a target market (Japan by default) and
 launches the product like a local: 12 research agents read the official site
 and the local web in parallel with Tavily, a strategist on Nosana writes a
 four-scene script in the local language where every sentence carries a source,
@@ -52,4 +52,4 @@ the whole run orchestrated and traced in AgentField.
 
 ### Japanese version, if a Japanese answer is preferred
 
-LaunchLocalは、製品のURLと対象市場（標準は日本）を指定するだけで、現地向けのローンチ動画を作成するエージェントです。12の調査エージェントがTavilyで公式サイトと現地のウェブを並行して調べ、Nosana上のモデルが出典付きの台本と音声を作成し、CodeAFが公式サイトに合わせてデザインを整え、Daytonaのサンドボックスで動画をレンダリングします。最後に現地の購買担当者役のエージェントが内容を審査し、すべての主張から出典を確認できるインタラクティブなレポートとあわせて、AgentFieldで全工程を記録します。
+LaunchLocallyは、製品のURLと対象市場（標準は日本）を指定するだけで、現地向けのローンチ動画を作成するエージェントです。12の調査エージェントがTavilyで公式サイトと現地のウェブを並行して調べ、Nosana上のモデルが出典付きの台本と音声を作成し、CodeAFが公式サイトに合わせてデザインを整え、Daytonaのサンドボックスで動画をレンダリングします。最後に現地の購買担当者役のエージェントが内容を審査し、すべての主張から出典を確認できるインタラクティブなレポートとあわせて、AgentFieldで全工程を記録します。

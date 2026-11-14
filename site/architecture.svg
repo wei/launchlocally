@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-labelledby="t d">
-<title id="t">LaunchLocal architecture</title>
+<title id="t">LaunchLocally architecture</title>
 <desc id="d">A product URL and a market pack enter the AgentField control plane, which runs seven stages as separate nodes: research (Tavily and Nosana Qwen), script (Nosana Qwen), voice (Nosana GPU), compose (local code), code (CodeAF), render (Daytona) and buyer gate (Nosana Qwen). A rejected cut loops back to the script as cut 2. The output is a launch video and an interactive brief.</desc>
 <style>
   text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:#eceae4;font-size:18px}
@@ -21,7 +21,7 @@
 <rect width="1600" height="900" fill="#14161a"/>
 
 <!-- title -->
-<text x="20" y="58" style="font-size:40px;font-weight:800">LaunchLocal</text>
+<text x="20" y="58" style="font-size:40px;font-weight:800">LaunchLocally</text>
 <text x="20" y="96" class="dim" style="font-size:22px">Paste a URL. Launch like a local. Which partner technology does what.</text>
 <path class="pack" d="M1250 48H1310"/><text x="1324" y="54">market pack feeds a stage</text>
 <path class="rej" d="M1250 84H1310"/><text x="1324" y="90">rejected cut loops back</text>

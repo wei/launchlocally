@@ -1,5 +1,5 @@
 /*
- Baseline look for the LaunchLocal video. Restyle freely; keep the class names.
+ Baseline look for the LaunchLocally video. Restyle freely; keep the class names.
  Variables (set per brand above this file): --background --surface --text --muted --primary --accent
    --on-primary (readable text on --primary) --font-heading --font-body. html[data-theme] is "light" or "dark".
  Classes:

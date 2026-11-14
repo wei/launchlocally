@@ -253,7 +253,7 @@ async def run_research(run_dir: Path, url: str, pack: dict) -> None:
     pages_read = 0
     model = _Model(run_dir)
     tavily = AsyncTavilyClient(api_key=os.environ["TAVILY_API_KEY"])
-    http = httpx.AsyncClient(timeout=12, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0 LaunchLocal/1.0"})
+    http = httpx.AsyncClient(timeout=12, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0 LaunchLocally/1.0"})
     async def homepage():
         response = await http.get(url)
         response.raise_for_status()
