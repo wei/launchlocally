@@ -23,7 +23,7 @@ html,body{height:100%;background:#000;color:var(--text);
 .slide{position:absolute;inset:0;padding:2.5em 4em 3.2em;display:flex;flex-direction:column;
   visibility:hidden;line-height:1.45}
 .slide.on{visibility:visible}
-.slide::after{content:attr(data-n) " / 10";position:absolute;right:2em;bottom:1.1em;
+.slide::after{content:attr(data-n) " / 11";position:absolute;right:2em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-variant-numeric:tabular-nums}
 .slide::before{content:"LaunchLocally";position:absolute;left:4em;bottom:1.1em;
   font-size:.8em;color:var(--dim);font-weight:700;letter-spacing:.02em}
@@ -87,6 +87,7 @@ b,.acc{color:var(--accent);font-weight:700}
 .shots img{flex:1;min-height:0;max-width:100%;object-fit:contain;border-radius:.4em}
 .shots figcaption{font-size:.85em;font-weight:700;margin-top:.25em}
 .shots figcaption b{margin-right:.4em}
+.shots figcaption .pill{margin-right:.5em}
 .shots figcaption .jp{font-size:.9em;margin-left:.7em}
 
 /* 4 architecture diagram */
@@ -281,7 +282,21 @@ b,.acc{color:var(--accent);font-weight:700}
   </div>
 </section>
 
-<section class="slide s5" data-n="7">
+<section class="slide shots" data-n="7">
+  <h2>Partner technology in use<span>パートナー技術の利用状況</span></h2>
+  <div class="grid">
+    <figure><img src="../img/partner-agentfield.png" alt="AgentField workflow graph for one LaunchLocally run: the launch node and one node per pipeline stage">
+      <figcaption><span class="pill" style="background:#a78bfa">AgentField</span><span class="pill" style="background:#f472b6">CodeAF</span>Workflow graph of one run<span class="jp">ワークフロー図</span></figcaption></figure>
+    <figure><img src="../img/partner-tavily.png" alt="Tavily dashboard: 612 of 1,000 credits used">
+      <figcaption><span class="pill" style="background:#38bdf8">Tavily</span>612 of 1,000 credits used<span class="jp">1,000クレジット中612を使用</span></figcaption></figure>
+    <figure><img src="../img/partner-nosana.png" alt="Nosana dashboard: two GPU deployments running, a Kokoro voice model and a vLLM text model">
+      <figcaption><span class="pill" style="background:#34d399">Nosana</span>Two GPU deployments running<span class="jp">GPUデプロイ2件が稼働中</span></figcaption></figure>
+    <figure><img src="../img/partner-daytona.png" alt="Daytona dashboard: one started sandbox with 4 vCPU and 8 GiB of memory">
+      <figcaption><span class="pill" style="background:#fbbf24">Daytona</span>Render sandbox, 4 vCPU and 8 GiB<span class="jp">レンダリング用サンドボックス</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="slide s5" data-n="8">
   <h2>Honest by design</h2>
   <p class="jp">正確さを守る設計</p>
   <div class="body">
@@ -296,7 +311,7 @@ b,.acc{color:var(--accent);font-weight:700}
   </div>
 </section>
 
-<section class="slide" data-n="8">
+<section class="slide" data-n="9">
   <h2>Any market</h2>
   <p class="jp">どの市場にも対応できます</p>
   <div class="body">
@@ -324,7 +339,7 @@ b,.acc{color:var(--accent);font-weight:700}
   </div>
 </section>
 
-<section class="slide s9" data-n="9">
+<section class="slide s9" data-n="10">
   <h2>We launched ourselves with it</h2>
   <p class="jp">自分たちのローンチ動画もLaunchLocallyで作りました</p>
   <div class="body">
@@ -338,7 +353,7 @@ b,.acc{color:var(--accent);font-weight:700}
   </div>
 </section>
 
-<section class="slide" data-n="10">
+<section class="slide" data-n="11">
   <h2>Links and numbers</h2>
   <p class="jp">リンクと数値</p>
   <div class="body">
